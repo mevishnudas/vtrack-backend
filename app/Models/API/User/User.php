@@ -1,0 +1,20 @@
+<?php
+
+namespace App\Models\API\User;
+
+use Illuminate\Database\Eloquent\Model;
+use DB;
+
+class User extends Model
+{
+    public static function allUserlist(){
+        $response = DB::table("user")
+                        ->select(
+                            'id',
+                            'name'
+                        )
+                        ->where("payee_status",1)
+                        ->get();
+        return $response;
+    }
+}
