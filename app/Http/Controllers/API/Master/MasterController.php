@@ -13,4 +13,11 @@ class MasterController extends Controller
         return response(["status"=>200,"msg"=>"Success","data"=>$bankList],200);
     }
 
+    public function yearList(Request $request){
+        $data = array();
+        $data[] = 2023;
+        $data[] = 2024;
+        $data[] = 2025;
+        return response(["status"=>200,"msg"=>"Success","data"=>$data],200);
+    }
 }

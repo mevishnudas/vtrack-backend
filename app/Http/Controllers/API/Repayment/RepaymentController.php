@@ -35,7 +35,7 @@ class RepaymentController extends Controller
             $insert_data["amount"] = $request->amount;
             $insert_data["pr_fee"] = $request->pr_fee;
             $insert_data["charges"] = $request->charges;
-            $insert_data["total"] = round(($request->amount+$request->payee+$request->charges));
+            $insert_data["total"] = round(($request->amount+$request->pr_fee+$request->charges));
 
             $insert_data["payment_date"] = date('Y-m-d',strtotime($request->payment_date));
             $insert_data["distributed_date"] = date('Y-m-d',strtotime($request->distributed_date));

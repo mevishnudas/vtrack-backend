@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Dec 17, 2025 at 05:43 PM
--- Server version: 8.3.0
--- PHP Version: 8.2.18
+-- Generation Time: Dec 18, 2025 at 12:23 PM
+-- Server version: 9.1.0
+-- PHP Version: 8.4.0
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -14842,24 +14842,21 @@ CREATE TABLE IF NOT EXISTS `repayment` (
   `remarks` longtext,
   `payment_status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'PENDING' COMMENT 'RECEIVED,PARTIALLY_PAID,PENDING',
   `source` int DEFAULT NULL,
+  `payment_type` varchar(20) NOT NULL DEFAULT 'ONE_TIME' COMMENT 'ONE_TIME,EMI',
   `payee_id` int DEFAULT NULL,
   `user_id` int DEFAULT NULL,
   `status` int NOT NULL DEFAULT '1',
   `date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `repayment`
 --
 
-INSERT INTO `repayment` (`id`, `amount`, `pr_fee`, `charges`, `total`, `payment_date`, `distributed_date`, `remarks`, `payment_status`, `source`, `payee_id`, `user_id`, `status`, `date`, `update_at`) VALUES
-(1, 10000, 199, 199, 10323, '2025-12-26', '2025-12-17', 'test', 'PENDING', 1, 2, 1, 1, '2025-12-17 13:38:11', '2025-12-17 16:04:36'),
-(7, 5000, 199, 128, 5129, '2025-12-27', '2025-12-17', NULL, 'PENDING', 3, 1, 1, 1, '2025-12-17 16:39:32', NULL),
-(8, 5000, 200, 120, 5121, '2025-12-26', '2025-12-17', NULL, 'PENDING', 2, 1, 1, 1, '2025-12-17 17:15:58', NULL),
-(9, 20000, 499, 1200, 21202, '2025-12-28', '2025-12-17', NULL, 'PENDING', 4, 2, 1, 1, '2025-12-17 23:03:36', NULL),
-(10, 15000, 499, 800, 15802, '2025-12-30', '2025-12-17', 'Testing', 'PENDING', 3, 2, 1, 1, '2025-12-17 23:04:11', NULL);
+INSERT INTO `repayment` (`id`, `amount`, `pr_fee`, `charges`, `total`, `payment_date`, `distributed_date`, `remarks`, `payment_status`, `source`, `payment_type`, `payee_id`, `user_id`, `status`, `date`, `update_at`) VALUES
+(15, 10000, 499, 344, 10843, '2026-01-03', '2025-12-04', 'revoked', 'PENDING', 1, 'ONE_TIME', 3, 1, 1, '2025-12-18 15:29:12', NULL);
 
 -- --------------------------------------------------------
 
@@ -14881,15 +14878,19 @@ CREATE TABLE IF NOT EXISTS `user` (
   `date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `user`
 --
 
 INSERT INTO `user` (`id`, `name`, `phone`, `email`, `password`, `hm_password`, `token`, `payee_status`, `status`, `date`, `update_at`) VALUES
-(1, 'Vishnu Das', '8086464729', 'dvishnudas@gmail.com', '5f4dcc3b5aa765d61d8327deb882cf99', '4cc51337319a4088db3bfd055ac77afe', '42WftRirZoahu2i2ammf9vv8xRjX2yEMhbtozYNe5sPWq8Lm4p', 1, 1, '2023-11-12 18:27:22', '2025-12-17 22:20:27'),
-(2, 'Aadhi Hollywood', '8921261957', NULL, NULL, NULL, NULL, 1, 0, '2024-09-28 18:39:30', NULL);
+(1, 'Vishnu Das', '8086464729', 'dvishnudas@gmail.com', '5f4dcc3b5aa765d61d8327deb882cf99', '4cc51337319a4088db3bfd055ac77afe', 'DHENdRwRGLKs3AwckQZEejNN3tivquR2e5NXj9zNvYTvAvWwKL', 1, 1, '2023-11-12 18:27:22', '2025-12-18 11:16:28'),
+(3, 'Arun PS', '8606507106', NULL, NULL, NULL, NULL, 1, 0, '2025-12-18 12:50:50', NULL),
+(4, 'Amal CS', '9747297969', NULL, NULL, NULL, NULL, 1, 0, '2025-12-18 12:50:50', '2025-12-18 12:52:12'),
+(5, 'Aneesh PC', '8714285056', NULL, NULL, NULL, NULL, 1, 0, '2025-12-18 12:51:56', NULL),
+(6, 'Nandu Lal', '8129460769', NULL, NULL, NULL, NULL, 1, 0, '2025-12-18 12:51:56', NULL),
+(7, 'Abhinad PS', '6238538308', 'abhinandps741@gmail.com', NULL, NULL, NULL, 1, 0, '2025-12-18 12:54:20', NULL);
 
 -- --------------------------------------------------------
 
