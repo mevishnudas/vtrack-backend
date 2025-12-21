@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\API\Repayment\Repayment;
+use Carbon\Carbon;
 
 class RepaymentController extends Controller
 {
@@ -54,14 +55,26 @@ class RepaymentController extends Controller
     public function list(Request $request){
 
         $validator = Validator::make($request->all(), [
-            //"month"=>'required|numeric',
+            "year"=>'required|numeric|in:2023,2024,2025,2026',
+            "month"=>'required|numeric|in:1,2,3,4,5,6,7,8,9,10,11,12',
+            "payee"=>'present|nullable|numeric'
         ]);
         if ($validator->fails()) {
             return response(["status"=>401,"msg"=>"Invalid Parameters","data"=>$validator->errors()],401);
         }else{
 
             $data = array();
-            $repaymentList = Repayment::list();
+
+            //Date Format
+            $startDate = Carbon::create($request->year, $request->month, 1)->startOfDay();
+            $endDate   = Carbon::create($request->year, $request->month, 1)->endOfMonth()->endOfDay();
+
+            $sort_data = array();
+            $sort_data["start_date"] = $startDate;
+            $sort_data["end_date"] = $endDate;
+            $sort_data["payee"] = $request->payee;
+            $repaymentList = Repayment::list($sort_data);
+
             //User Info
             $userInfo = app('userData');
             foreach ($repaymentList as $repaymentList_row) {

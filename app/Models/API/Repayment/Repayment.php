@@ -12,8 +12,8 @@ class Repayment extends Model
         return $response;
     }
 
-    public static function list(){
-        $response = DB::table("repayment")
+    public static function list($sort_data){
+        $query = DB::table("repayment")
                     ->select(
                         "user.id as payee_id",
                         "user.name as payee",
@@ -37,8 +37,18 @@ class Repayment extends Model
                     )
                     ->join("user",'user.id', '=', 'repayment.payee_id')
                     ->join("bank",'bank.id', '=', 'repayment.source')
-                    ->where("repayment.status",1)
-                    ->get();
+                    ->where("repayment.status",1);
+
+                    //Filter
+                    $query->whereBetween("repayment.payment_date",[$sort_data["start_date"],$sort_data["end_date"]]);
+
+                    //Filter User
+                    if(!empty($sort_data["payee"])){
+                        $query->where("repayment.payee_id",$sort_data["payee"]);
+                    }
+
+
+        $response = $query->get();
         return $response;
     }
 }

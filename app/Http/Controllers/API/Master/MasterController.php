@@ -18,6 +18,7 @@ class MasterController extends Controller
         $data[] = 2023;
         $data[] = 2024;
         $data[] = 2025;
+        $data[] = 2026;
         return response(["status"=>200,"msg"=>"Success","data"=>$data],200);
     }
 }

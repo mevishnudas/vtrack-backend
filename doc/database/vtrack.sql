@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Dec 19, 2025 at 12:04 PM
--- Server version: 9.1.0
--- PHP Version: 8.4.0
+-- Generation Time: Dec 21, 2025 at 05:16 PM
+-- Server version: 8.3.0
+-- PHP Version: 8.2.18
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -43,9 +43,9 @@ CREATE TABLE IF NOT EXISTS `bank` (
 
 INSERT INTO `bank` (`id`, `name`, `status`, `date`, `update_at`) VALUES
 (1, 'KGB', 1, '2025-12-17 15:45:50', NULL),
-(2, 'ICICI', 1, '2025-12-17 15:45:50', NULL),
-(3, 'Axis', 1, '2025-12-17 15:46:15', NULL),
-(4, 'Federal', 1, '2025-12-17 15:46:15', NULL),
+(2, 'ICICI Bank', 1, '2025-12-17 15:45:50', '2025-12-20 23:39:38'),
+(3, 'Axis Bank', 1, '2025-12-17 15:46:15', '2025-12-20 23:39:33'),
+(4, 'Federal Bank', 1, '2025-12-17 15:46:15', '2025-12-20 23:39:43'),
 (5, 'Indusind', 1, '2025-12-17 15:46:29', NULL),
 (6, 'Amazon ICICI', 1, '2025-12-17 15:47:26', '2025-12-17 15:49:03'),
 (7, 'ICICI Card', 1, '2025-12-17 15:47:26', NULL),
@@ -14849,7 +14849,7 @@ CREATE TABLE IF NOT EXISTS `repayment` (
   `date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `repayment`
@@ -14858,7 +14858,16 @@ CREATE TABLE IF NOT EXISTS `repayment` (
 INSERT INTO `repayment` (`id`, `amount`, `pr_fee`, `charges`, `total`, `payment_date`, `distributed_date`, `remarks`, `payment_status`, `source`, `payment_type`, `payee_id`, `user_id`, `status`, `date`, `update_at`) VALUES
 (15, 10000, 499, 344, 10843, '2026-01-03', '2025-12-04', 'revoked', 'PENDING', 1, 'ONE_TIME', 3, 1, 1, '2025-12-18 15:29:12', NULL),
 (16, 30000, 699, 1679, 32378, '2026-01-04', '2025-12-05', 'revoked', 'PENDING', 1, 'ONE_TIME', 4, 1, 1, '2025-12-18 23:09:28', NULL),
-(17, 60000, 1499, 1729, 63228, '2026-01-05', '2025-12-06', 'revoked', 'PENDING', 1, 'ONE_TIME', 4, 1, 1, '2025-12-19 12:05:24', NULL);
+(17, 60000, 1499, 1729, 63228, '2026-01-05', '2025-12-06', 'revoked', 'PENDING', 1, 'ONE_TIME', 4, 1, 1, '2025-12-19 12:05:24', NULL),
+(18, 25000, 699, 1644, 27343, '2026-01-06', '2025-12-08', NULL, 'PENDING', 3, 'ONE_TIME', 5, 1, 1, '2025-12-20 23:35:54', NULL),
+(19, 10000, 499, 339, 10838, '2026-01-06', '2025-12-08', 'new', 'PENDING', 1, 'ONE_TIME', 4, 1, 1, '2025-12-20 23:36:56', NULL),
+(20, 65000, 1599, 1819, 68418, '2026-01-08', '2025-12-09', 'revoked', 'PENDING', 1, 'ONE_TIME', 6, 1, 1, '2025-12-20 23:37:35', NULL),
+(21, 10000, 499, 322, 10821, '2026-01-09', '2025-12-10', 'revoked', 'PENDING', 3, 'ONE_TIME', 4, 1, 1, '2025-12-20 23:38:14', NULL),
+(22, 20000, 499, 1187, 21686, '2026-01-06', '2025-12-09', 'revoked', 'PENDING', 3, 'ONE_TIME', 4, 1, 1, '2025-12-20 23:39:19', NULL),
+(23, 5500, 199, 326, 6025, '2026-01-18', '2025-12-18', NULL, 'PENDING', 2, 'ONE_TIME', 5, 1, 1, '2025-12-20 23:40:35', NULL),
+(24, 13000, 499, 787, 14286, '2026-01-18', '2025-12-19', NULL, 'PENDING', 2, 'ONE_TIME', 8, 1, 1, '2025-12-20 23:42:30', NULL),
+(25, 20000, 499, 1162, 21661, '2026-01-18', '2025-12-19', 'revoked', 'PENDING', 1, 'ONE_TIME', 3, 1, 1, '2025-12-20 23:43:22', NULL),
+(26, 10000, 499, 335, 10834, '2026-01-18', '2025-12-19', 'revoked', 'PENDING', 2, 'ONE_TIME', 4, 1, 1, '2025-12-20 23:44:23', NULL);
 
 -- --------------------------------------------------------
 
@@ -14880,19 +14889,20 @@ CREATE TABLE IF NOT EXISTS `user` (
   `date` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `user`
 --
 
 INSERT INTO `user` (`id`, `name`, `phone`, `email`, `password`, `hm_password`, `token`, `payee_status`, `status`, `date`, `update_at`) VALUES
-(1, 'Vishnu Das', '8086464729', 'dvishnudas@gmail.com', '5f4dcc3b5aa765d61d8327deb882cf99', '4cc51337319a4088db3bfd055ac77afe', 'TWG6hroSvVZrIipruOjXGoCvKHwJxyw5feZCDavJeB0tOmJvhe', 1, 1, '2023-11-12 18:27:22', '2025-12-19 10:09:30'),
+(1, 'Vishnu Das', '8086464729', 'dvishnudas@gmail.com', '5f4dcc3b5aa765d61d8327deb882cf99', '4cc51337319a4088db3bfd055ac77afe', '4OkSMX6rL6AtnZFxEm6RmdLv95jUGSSN1L0zH9p3DL50bAHGE8', 1, 1, '2023-11-12 18:27:22', '2025-12-20 22:17:15'),
 (3, 'Arun PS', '8606507106', NULL, NULL, NULL, NULL, 1, 0, '2025-12-18 12:50:50', NULL),
 (4, 'Amal CS', '9747297969', NULL, NULL, NULL, NULL, 1, 0, '2025-12-18 12:50:50', '2025-12-18 12:52:12'),
 (5, 'Aneesh PC', '8714285056', NULL, NULL, NULL, NULL, 1, 0, '2025-12-18 12:51:56', NULL),
 (6, 'Nandu Lal', '8129460769', NULL, NULL, NULL, NULL, 1, 0, '2025-12-18 12:51:56', NULL),
-(7, 'Abhinad PS', '6238538308', 'abhinandps741@gmail.com', NULL, NULL, NULL, 1, 0, '2025-12-18 12:54:20', NULL);
+(7, 'Abhinad PS', '6238538308', 'abhinandps741@gmail.com', NULL, NULL, NULL, 1, 0, '2025-12-18 12:54:20', NULL),
+(8, 'Sonu PS', '9995853151', NULL, NULL, NULL, NULL, 1, 0, '2025-12-20 23:41:35', NULL);
 
 -- --------------------------------------------------------
 
