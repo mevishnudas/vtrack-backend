@@ -21,4 +21,25 @@ class MasterController extends Controller
         $data[] = 2026;
         return response(["status"=>200,"msg"=>"Success","data"=>$data],200);
     }
+
+    public function paymentStatus(){
+
+        $data = array();
+        $data[] = array(
+            "label"=>"Pending",
+            "value"=>"PENDING"
+        );
+
+        $data[] = array(
+            "label"=>"Received",
+            "value"=>"RECEIVED"
+        );
+
+        $data[] = array(
+            "label"=>"Partially Paid",
+            "value"=>"PARTIALLY_PAID"
+        );
+
+        return response(["status"=>200,"msg"=>"Success","data"=>$data],200);
+    }
 }

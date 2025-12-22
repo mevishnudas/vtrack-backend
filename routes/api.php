@@ -26,3 +26,4 @@ Route::get('/users/list',[UserController::class,'list'])->middleware([ApiAuth::c
 #Masters
 Route::get('/master/bank/list',[MasterController::class,'bankList'])->middleware([ApiAuth::class]);
 Route::get('/master/year/list',[MasterController::class,'yearList'])->middleware([ApiAuth::class]);
+Route::get('/master/payment/status',[MasterController::class,'paymentStatus'])->middleware([ApiAuth::class]);
