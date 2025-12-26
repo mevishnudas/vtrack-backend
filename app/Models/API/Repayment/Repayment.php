@@ -12,6 +12,15 @@ class Repayment extends Model
         return $response;
     }
 
+    public static function updateRecord($update_data,$id){
+        $userInfo = app('userData');
+        $response = DB::table("repayment")
+                        ->where("id",$id)
+                        ->where("user_id",$userInfo["id"])
+                        ->update($update_data);
+        return $response;
+    }
+
     public static function list($sort_data){
         $query = DB::table("repayment")
                     ->select(
