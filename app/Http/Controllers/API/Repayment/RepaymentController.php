@@ -146,4 +146,48 @@ class RepaymentController extends Controller
         }
     }
 
+    public function emiAdd(Request $request){
+
+        $validator = Validator::make($request->all(), [
+            'payee' => 'required|numeric|exists:user,id',
+            'from'=>'required|numeric|exists:bank,id',
+
+            'amount' => 'required|numeric',
+            'pr_fee'=>'required|numeric',
+            'emi'=>'required|numeric',
+            'duration'=>'required|numeric',
+
+            'distributed_date'=>'required|date',
+            'payment_date'=>'required|date',
+
+            'remarks'=>'present|nullable'
+        ]);
+
+        if ($validator->fails()) {
+            return response(["status"=>401,"msg"=>"Invalid Parameters","data"=>$validator->errors()],401);
+        }else{
+            //User Info
+            $userInfo = app('userData');
+
+            $insert_data = array();
+            $insert_data["payee"] = $request->payee;
+            $insert_data["source"] = $request->from;
+
+            $insert_data["amount"] = $request->amount;
+            $insert_data["pr_fee"] = $request->pr_fee;
+            $insert_data["emi"] = $request->emi;
+            $insert_data["duration"] = $request->duration;
+
+            $insert_data["remarks"] = $request->remarks;
+            $insert_data["user_id"] = $userInfo["id"];
+
+            $insert_data["distributed_date"] = date('Y-m-d',strtotime($request->distributed_date));
+            $insert_data["payment_date"] = date('Y-m-d',strtotime($request->payment_date));
+
+            Repayment::emiAdd($insert_data);
+            return response(["status"=>200,"msg"=>"Success"],200);
+        }
+    }
+
+
 }

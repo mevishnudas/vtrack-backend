@@ -4,6 +4,7 @@ namespace App\Models\API\Repayment;
 
 use Illuminate\Database\Eloquent\Model;
 use DB;
+use Symfony\Component\HttpFoundation\Request;
 
 class Repayment extends Model
 {
@@ -58,6 +59,11 @@ class Repayment extends Model
 
 
         $response = $query->get();
+        return $response;
+    }
+
+    public static function emiAdd($insert_data){
+        $response = DB::table("repayment_emi")->insert($insert_data);
         return $response;
     }
 }

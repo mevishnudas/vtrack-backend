@@ -20,6 +20,7 @@ Route::get('/token/validate',[LoginController::class,'tokenValidate'])->middlewa
 Route::post('/repayment/list',[RepaymentController::class,'list'])->middleware([ApiAuth::class]);
 Route::post('/repayment/add',[RepaymentController::class,'addNew'])->middleware([ApiAuth::class]);
 Route::post('/repayment/update',[RepaymentController::class,'update'])->middleware([ApiAuth::class]);
+Route::post('/repayment/emi/add',[RepaymentController::class,'emiAdd'])->middleware([ApiAuth::class]);
 
 #Users
 Route::get('/users/list',[UserController::class,'list'])->middleware([ApiAuth::class]);
