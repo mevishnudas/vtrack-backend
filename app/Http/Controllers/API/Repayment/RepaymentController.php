@@ -96,7 +96,7 @@ class RepaymentController extends Controller
         $validator = Validator::make($request->all(), [
             "year"=>'required|numeric|in:2023,2024,2025,2026',
             "month"=>'required|numeric|in:1,2,3,4,5,6,7,8,9,10,11,12',
-            "payee"=>'present|nullable|numeric'
+            "payee"=>'sometimes|nullable|exclude_if:payee,0|integer|exists:user,id'
         ]);
         if ($validator->fails()) {
             return response(["status"=>401,"msg"=>"Invalid Parameters","data"=>$validator->errors()],401);
@@ -186,6 +186,55 @@ class RepaymentController extends Controller
 
             Repayment::emiAdd($insert_data);
             return response(["status"=>200,"msg"=>"Success"],200);
+        }
+    }
+
+    public function emiList(Request $request){
+
+        $validator = Validator::make($request->all(), [
+            //"year"=>'required|numeric|min:2023|max:2026',
+            //"month"=>'required|numeric|min:1|max:12',
+            "status"=>'required|string|in:OPEN,CLOSED,PRE_CLOSED',
+            "payee"=>'sometimes|nullable|exclude_if:payee,0|integer|exists:user,id'
+        ]);
+        if ($validator->fails()) {
+            return response(["status"=>401,"msg"=>"Invalid Parameters","data"=>$validator->errors()],401);
+        }else{
+
+            //Date Format
+            $sort_data = array();
+            $sort_data["status"] = $request->status;
+            $sort_data["payee"] = $request->payee;
+
+            $emiList = Repayment::emiList($sort_data);
+
+            $data = array();
+            foreach ($emiList as $emiList_row) {
+
+                $data[] = array(
+                    "id"=>$emiList_row->id,
+                    "payee_id"=>$emiList_row->payee_id,
+                    "payee"=>$emiList_row->payee,
+
+                    "amount"=>$emiList_row->amount,
+                    "emi"=>$emiList_row->emi,
+                    "pr_fee"=>$emiList_row->pr_fee,
+                    "duration"=>$emiList_row->duration,
+                    "paid"=>$emiList_row->paid,
+
+                    "payment_date"=>$emiList_row->payment_date,
+                    "distributed_date"=>$emiList_row->distributed_date,
+
+                    "source"=>$emiList_row->source,
+                    "source_id"=>$emiList_row->source_id,
+
+                    "status"=>$emiList_row->emi_status,
+                    "remarks"=>$emiList_row->remarks
+                );
+            }
+
+            return response(["status"=>200,"msg"=>"Success","data"=>$data],200);
+
         }
     }
 

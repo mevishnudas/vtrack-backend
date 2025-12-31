@@ -42,4 +42,25 @@ class MasterController extends Controller
 
         return response(["status"=>200,"msg"=>"Success","data"=>$data],200);
     }
+
+    public function emiStatus(){
+        $data = array();
+
+        $data[] = array(
+            "label"=>"Open",
+            "value"=>"OPEN"
+        );
+
+        $data[] = array(
+            "label"=>"Closed",
+            "value"=>"CLOSED"
+        );
+
+        $data[] = array(
+            "label"=>"Pre Closed",
+            "value"=>"PRE_CLOSED"
+        );
+
+        return response(["status"=>200,"msg"=>"Success","data"=>$data],200);
+    }
 }

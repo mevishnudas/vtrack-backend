@@ -23,6 +23,9 @@ class Repayment extends Model
     }
 
     public static function list($sort_data){
+
+        $userInfo = app('userData');
+
         $query = DB::table("repayment")
                     ->select(
                         "user.id as payee_id",
@@ -47,7 +50,8 @@ class Repayment extends Model
                     )
                     ->join("user",'user.id', '=', 'repayment.payee_id')
                     ->join("bank",'bank.id', '=', 'repayment.source')
-                    ->where("repayment.status",1);
+                    ->where("repayment.status",1)
+                    ->where("repayment.user_id",$userInfo['id']);
 
                     //Filter
                     $query->whereBetween("repayment.payment_date",[$sort_data["start_date"],$sort_data["end_date"]]);
@@ -64,6 +68,43 @@ class Repayment extends Model
 
     public static function emiAdd($insert_data){
         $response = DB::table("repayment_emi")->insert($insert_data);
+        return $response;
+    }
+
+    public static function emiList($sort_data){
+        $userInfo = app('userData');
+
+        $response = DB::table("repayment_emi")
+                        ->select(
+                            "repayment_emi.id",
+                            "repayment_emi.payee as payee_id",
+                            "user.name as payee",
+
+                            "repayment_emi.amount",
+                            "repayment_emi.emi",
+                            "repayment_emi.pr_fee",
+                            "repayment_emi.paid",
+                            "repayment_emi.duration",
+
+                            "repayment_emi.payment_date",
+                            "repayment_emi.distributed_date",
+
+                            "bank.name as source",
+                            "bank.id as source_id",
+
+                            "repayment_emi.emi_status",
+                            "repayment_emi.remarks"
+                        )
+                        ->where("repayment_emi.status",1)
+                        ->join("user",'user.id', '=', 'repayment_emi.payee')
+                        ->join("bank",'bank.id', '=', 'repayment_emi.source')
+                        ->where("repayment_emi.user_id",$userInfo['id'])
+                        ->where("repayment_emi.emi_status",$sort_data['status'])
+
+                        //Filter by user
+                        ->when($sort_data["payee"],fn($q)=>$q->where("repayment_emi.payee",$sort_data["payee"]))
+                        ->get();
+
         return $response;
     }
 }
