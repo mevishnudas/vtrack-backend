@@ -61,6 +61,8 @@ class Repayment extends Model
                         $query->where("repayment.payee_id",$sort_data["payee"]);
                     }
 
+                    $query->orderBy("repayment.payment_date","asc");
+
 
         $response = $query->get();
         return $response;
