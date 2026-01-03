@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\API\Repayment\Repayment;
 use Carbon\Carbon;
+use Illuminate\Validation\Rule;
+use Illuminate\Database\Query\Builder;
 
 class RepaymentController extends Controller
 {
@@ -238,5 +240,77 @@ class RepaymentController extends Controller
         }
     }
 
+    public function emiScheduleList(Request $request){
+        //User Info
+        $userInfo = app('userData');
+        $validator = Validator::make($request->all(), [
+        'id' => ['required',
+                Rule::exists('repayment_emi','id')->where(function ($query) use ($userInfo) {
+                $query->where('user_id', $userInfo["id"]);
+            })]
+        ]);
+
+        if ($validator->fails()) {
+            return response(["status"=>401,"msg"=>"Invalid Parameters","data"=>$validator->errors()],401);
+        }else{
+
+            $emiSchedule = Repayment::emiSchedule($request->id);
+            return response(["status"=>200,"msg"=>"Success","data"=>$emiSchedule],200);
+        }
+    }
+
+    public function emiScheduleAdd(Request $request){
+
+        $userInfo = app('userData');
+        $validator = Validator::make($request->all(), [
+        'id' => ['required',
+                Rule::exists('repayment_emi','id')->where(function ($query) use ($userInfo) {
+                $query->where('user_id', $userInfo["id"]);
+            })],
+        "principle"=>"required|numeric",
+        "amount"=>"required|numeric",
+        "payment_date"=>"required|date",
+        "remarks"=>"present|nullable"
+        ]);
+
+        if ($validator->fails()) {
+            return response(["status"=>401,"msg"=>"Invalid Parameters","data"=>$validator->errors()],401);
+        }else{
+
+            $insert_data = array(
+                "emi_id"=>$request->id,
+                "principle"=>$request->principle,
+                "amount"=>$request->amount,
+                "payment_date"=>date('Y-m-d',strtotime($request->payment_date)),
+                "remarks"=>$request->remarks,
+            );
+            $emiSchedule = Repayment::emiScheduleAdd($insert_data);
+
+            return response(["status"=>200,"msg"=>"Success"],200);
+        }
+    }
+
+    public function emiStatusUpdate(Request $request){
+         $validator = Validator::make($request->all(), [
+            "id"=>'required|numeric|exists:repayment_emi,id',
+            "paid"=>'required|numeric',
+            "status"=>'required|string|in:OPEN,CLOSED,PRE_CLOSED',
+            "remarks"=>'present|nullable'
+        ]);
+        if ($validator->fails()) {
+            return response(["status"=>401,"msg"=>"Invalid Parameters","data"=>$validator->errors()],401);
+        }else{
+
+            $update_data = array(
+                "paid"=>$request->paid,
+                "emi_status"=>$request->status,
+                "remarks"=>$request->remarks
+            );
+            Repayment::updateEMIStatus($update_data,$request->id);
+
+            return response(["status"=>200,"msg"=>"Success"],200);
+        }
+
+    }
 
 }

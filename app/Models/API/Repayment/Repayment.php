@@ -109,4 +109,36 @@ class Repayment extends Model
 
         return $response;
     }
+
+    public static function updateEMIStatus($update_data,$id){
+
+        $userInfo = app('userData');
+        $response = DB::table("repayment_emi")
+                        ->where("id",$id)
+                        ->where("user_id",$userInfo['id'])
+                        ->update($update_data);
+        return $response;
+    }
+
+    public static function emiSchedule($id){
+        $response = DB::table("repayment_emi_schedule")
+                        ->select(
+                            "repayment_emi_schedule.principle",
+                            "repayment_emi_schedule.amount",
+                            "repayment_emi_schedule.payment_date",
+                            "repayment_emi_schedule.payment_status",
+                            "repayment_emi_schedule.emi_id",
+                            "repayment_emi_schedule.remarks",
+                        )
+                        ->where("emi_id",$id)
+                        ->where("status",1)
+                        ->get();
+        return $response;
+    }
+
+    public static function emiScheduleAdd($insert_data){
+        $response = DB::table("repayment_emi_schedule")
+                        ->insert($insert_data);
+        return $response;
+    }
 }

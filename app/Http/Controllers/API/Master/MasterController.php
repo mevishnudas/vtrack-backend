@@ -63,4 +63,23 @@ class MasterController extends Controller
 
         return response(["status"=>200,"msg"=>"Success","data"=>$data],200);
     }
+
+
+    public function emiPrincipleStatus(){
+        $data = array();
+
+        $data[] = array(
+            "label"=>"Pending",
+            "value"=>"PENDING"
+        );
+
+        $data[] = array(
+            "label"=>"Paid",
+            "value"=>"PAID"
+        );
+
+        return response(["status"=>200,"msg"=>"Success","data"=>$data],200);
+    }
+
+
 }
