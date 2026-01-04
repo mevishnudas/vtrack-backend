@@ -24,6 +24,7 @@ Route::post('/repayment/update',[RepaymentController::class,'update'])->middlewa
 Route::post('/repayment/emi/add',[RepaymentController::class,'emiAdd'])->middleware([ApiAuth::class]);
 Route::post('/repayment/emi/list',[RepaymentController::class,'emiList'])->middleware([ApiAuth::class]);
 Route::post('/repayment/emi/schedule/add',[RepaymentController::class,'emiScheduleAdd'])->middleware([ApiAuth::class]);
+Route::post('/repayment/emi/schedule/update',[RepaymentController::class,'emiScheduleUpdate'])->middleware([ApiAuth::class]);
 Route::post('/repayment/emi/schedule/list',[RepaymentController::class,'emiScheduleList'])->middleware([ApiAuth::class]);
 
 #Users

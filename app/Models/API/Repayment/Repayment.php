@@ -123,6 +123,7 @@ class Repayment extends Model
     public static function emiSchedule($id){
         $response = DB::table("repayment_emi_schedule")
                         ->select(
+                            "repayment_emi_schedule.id",
                             "repayment_emi_schedule.principle",
                             "repayment_emi_schedule.amount",
                             "repayment_emi_schedule.payment_date",
@@ -136,9 +137,24 @@ class Repayment extends Model
         return $response;
     }
 
+    public static function emiScheduleCheck($user_id){
+        $response = DB::table("repayment_emi_schedule")
+                        ->join('repayment_emi','repayment_emi.id','=','repayment_emi_schedule.emi_id')
+                        ->where('repayment_emi.user_id',$user_id)
+                        ->first();
+        return $response;
+    }
+
     public static function emiScheduleAdd($insert_data){
         $response = DB::table("repayment_emi_schedule")
                         ->insert($insert_data);
+        return $response;
+    }
+
+    public static function emiScheduleUpdate($insert_data,$id){
+        $response = DB::table("repayment_emi_schedule")
+                        ->where("id",$id)
+                        ->update($insert_data);
         return $response;
     }
 }

@@ -290,6 +290,33 @@ class RepaymentController extends Controller
         }
     }
 
+    public function emiScheduleUpdate(Request $request){
+
+        $userInfo = app('userData');
+        $validator = Validator::make($request->all(), [
+            'id' =>'required|numeric|exists:repayment_emi_schedule,id',
+            "status"=>"required|in:PENDING,PAID",
+            "remarks"=>"present|nullable"
+        ]);
+
+        if ($validator->fails()) {
+            return response(["status"=>401,"msg"=>"Invalid Parameters","data"=>$validator->errors()],401);
+        }else{
+
+            //user permission check
+            $emiScheduleCheck = Repayment::emiScheduleCheck($userInfo["id"]);
+
+            if(!empty($emiScheduleCheck)){
+                $update_data = array(
+                    "payment_status"=>$request->status,
+                    "remarks"=>$request->remarks
+                );
+                Repayment::emiScheduleUpdate($update_data,$request->id);
+            }
+            return response(["status"=>200,"msg"=>"Success"],200);
+        }
+    }
+
     public function emiStatusUpdate(Request $request){
          $validator = Validator::make($request->all(), [
             "id"=>'required|numeric|exists:repayment_emi,id',
