@@ -133,6 +133,7 @@ class Repayment extends Model
                         )
                         ->where("emi_id",$id)
                         ->where("status",1)
+                        ->orderBy('repayment_emi_schedule.principle', 'DESC')
                         ->get();
         return $response;
     }
