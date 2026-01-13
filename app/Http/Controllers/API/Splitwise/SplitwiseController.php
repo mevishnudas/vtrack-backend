@@ -46,7 +46,7 @@ class SplitwiseController extends Controller
         }
 
         $insert_data = array();
-
+        $transactions = array();
         foreach ($request->friends as $friend) {
 
             $insert_data[] = array(
@@ -56,13 +56,45 @@ class SplitwiseController extends Controller
                 "user_id"=>$userInfo["id"]
             );
 
+            $transactions[] = array(
+                "friend_id"=>$friend,
+                "amount"=>$split_amount
+            );
+
         }
 
         if(!empty($insert_data))
-        { $response = Splitwise::expenseAdd($insert_data);}
-        return response(["status"=>200,"msg"=>"Success","data"=>$insert_data],200);
+        {
+            $response = Splitwise::expenseAdd($insert_data);
+            self::incrementExpenseSummary($transactions);
+        }
+        return response(["status"=>200,"msg"=>"Success"],200);
     }
 
+    protected function incrementExpenseSummary($transactions){
+
+        foreach ($transactions as $transaction) {
+            Splitwise::incrementExpenseSummary($transaction);
+        }
+        return true;
+    }
+
+
+    public function expenseList(Request $request){
+        $validator = Validator::make($request->all(), [
+            //
+        ]);
+
+        if ($validator->fails()) {
+            return response(["status"=>401,"msg"=>"Invalid Parameters","data"=>$validator->errors()],401);
+        }
+
+        $data = array();
+        $data["ows_you"] = Splitwise::expenseSummaryList(true); //Ows you
+        $data["you_owe"] = Splitwise::expenseSummaryList(false); //You owe
+
+        return response(["status"=>200,"msg"=>"Success","data"=>$data],200);
+    }
 
 
 //end class
