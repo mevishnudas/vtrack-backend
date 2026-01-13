@@ -17,4 +17,18 @@ class User extends Model
                         ->get();
         return $response;
     }
+
+    public static function friendsList(){
+        $userInfo = app('userData');
+        $response = DB::table("user")
+                        ->select(
+                            'id',
+                            'name'
+                        )
+                        ->where("payee_status",1)
+                        ->where("id","!=",$userInfo["id"])
+                        ->get();
+        return $response;
+    }
+
 }

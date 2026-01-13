@@ -8,6 +8,7 @@ use App\Http\Controllers\API\Login\LoginController;
 use App\Http\Controllers\API\Repayment\RepaymentController;
 use App\Http\Controllers\API\Master\MasterController;
 use App\Http\Controllers\API\User\UserController;
+use App\Http\Controllers\API\Splitwise\SplitwiseController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -27,8 +28,12 @@ Route::post('/repayment/emi/schedule/add',[RepaymentController::class,'emiSchedu
 Route::post('/repayment/emi/schedule/update',[RepaymentController::class,'emiScheduleUpdate'])->middleware([ApiAuth::class]);
 Route::post('/repayment/emi/schedule/list',[RepaymentController::class,'emiScheduleList'])->middleware([ApiAuth::class]);
 
+#Splitwise
+Route::post('/splitwise/expense/add',[SplitwiseController::class,'expenseAdd'])->middleware([ApiAuth::class]);
+
 #Users
 Route::get('/users/list',[UserController::class,'list'])->middleware([ApiAuth::class]);
+Route::get('/users/friends/list',[UserController::class,'friendsList'])->middleware([ApiAuth::class]);
 
 #Masters
 Route::get('/master/bank/list',[MasterController::class,'bankList'])->middleware([ApiAuth::class]);
