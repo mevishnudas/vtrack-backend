@@ -13,84 +13,131 @@ class Splitwise extends Model
         return $response;
     }
 
-    public static function expenseSummaryList($positive=true){
+    public static function expenseSummaryList(){
+
         $userInfo = app('userData');
-        $query = DB::table("splitwise_summary")
-                            ->join('user as to_user', 'to_user.id', '=', 'splitwise_summary.to_user')
-                            ->join('user as from_user', 'from_user.id', '=', 'splitwise_summary.from_user')
-                            ->select(
-                                "from_user.name as from_user_name",
-                                "to_user.name as to_user_name",
+        $query = DB::table("splitwise_summary");
+        $query->join('user', 'user.id', '=', 'splitwise_summary.to_user');
 
-                                "splitwise_summary.from_user",
-                                "splitwise_summary.to_user",
-
-                                "splitwise_summary.balance"
-                            )
-                            ->where(function ($q) use ($userInfo) {
-                                $q->where('from_user', $userInfo['id'])
-                                ->orWhere('to_user', $userInfo['id']);
-                            })
-                            //->where("splitwise_summary.user_id",$userInfo["id"])
-                            ->where("splitwise_summary.status",1);
-        // if($positive)
-        // {
-        //     $query->where("balance",">",0);
-        // }
-        // else{
-        //     $query->where("balance","<",0);
-        // }
-
-        $query->where("balance","!=",0);
+        $query->select(
+            "user.id",
+            "user.name",
+            "splitwise_summary.balance"
+        )
+        ->where('splitwise_summary.from_user', $userInfo['id'])
+        ->where("splitwise_summary.status",1);
 
         $response = $query->get();
         return $response;
     }
 
+    // public static function expenseSummaryListYouOws(){
+
+    //     $userInfo = app('userData');
+    //     $query = DB::table("splitwise_summary");
+    //     $query->join('user', 'user.id', '=', 'splitwise_summary.from_user');
+
+    //     $query->select(
+    //         "user.id",
+    //         "user.name",
+    //         "splitwise_summary.balance"
+    //     )
+    //     ->where('splitwise_summary.to_user', $userInfo['id'])
+    //     ->where("splitwise_summary.status",1);
+
+    //     $response = $query->get();
+    //     return $response;
+    // }
+
+    /*public static function expenseSummaryList($ows_you=true){
+
+        $userInfo = app('userData');
+        $query = DB::table("splitwise_summary");
+
+        if($ows_you){
+            $query->join('user', 'user.id', '=', 'splitwise_summary.to_user');
+        }else{
+            $query->join('user', 'user.id', '=', 'splitwise_summary.from_user');
+        }
+
+        $query->select(
+            "user.id",
+            "user.name",
+            "splitwise_summary.balance"
+        )
+        ->where('from_user', $userInfo['id'])
+        ->whereNot('user.id',$userInfo['id'])
+
+        ->where("splitwise_summary.status",1);
+
+        if($ows_you){
+            $query->where("splitwise_summary.balance",">",0);
+        }else{
+            $query->where("splitwise_summary.balance","<",0);
+        }
+
+        $response = $query->get();
+        return $response;
+    }*/
+
 
     public static function incrementExpenseSummary($transaction){
 
         $userInfo = app('userData');
-        //check data
+
+        //------------- First From Side -----------------//
         $checkData =  DB::table('splitwise_summary')
-                        ->where(function ($q) use ($transaction) {
-                            $q->where('from_user', $transaction['from_user'])
-                            ->where('to_user', $transaction['to_user']);
-                        })
-                        ->orWhere(function ($q) use ($transaction) {
-                            $q->where('from_user', $transaction['to_user'])
-                            ->where('to_user', $transaction['from_user']);
-                        })
+                        ->where('from_user', $transaction['from_user'])
+                        ->where('to_user', $transaction['to_user'])
                         ->where('status',1)
                     ->first();
 
         if(empty($checkData)){
+
             $response =  DB::table('splitwise_summary')
                           ->insert([
                                     "from_user"=>$transaction["from_user"],
                                     "to_user"=>$transaction["to_user"],
                                     "balance"=>$transaction["amount"],
-
                                     "user_id"=>$userInfo["id"]
-                                  ]);
+                            ]);
         }
         else{
 
             //increment value
             $query =  DB::table('splitwise_summary')
-                          ->where('id', $checkData->id);
+                          ->where('id', $checkData->id)
+                          ->increment('balance', $transaction["amount"]);
 
-            if($checkData->from_user==$userInfo["id"]){
-                $query->increment('balance', $transaction["amount"]);
-            }else{
-                //if it to user
-                $query->decrement('balance', $transaction["amount"]);
-            }
+        }
+
+        //----------------- Second to Side ------------------//
+        $checkData =  DB::table('splitwise_summary')
+                ->where('from_user', $transaction['to_user'])
+                ->where('to_user', $transaction['from_user'])
+                ->where('status',1)
+        ->first();
+
+        if(empty($checkData)){
+            $response =  DB::table('splitwise_summary')
+                            ->insert([
+                                        "from_user"=>$transaction["to_user"],
+                                        "to_user"=>$transaction["from_user"],
+                                        "balance"=>(0-$transaction["amount"]),
+                                        "user_id"=>$userInfo["id"]
+                                ]);
+        }else{
+
+            //decrement value
+            $query =  DB::table('splitwise_summary')
+                          ->where('id', $checkData->id)
+                          ->decrement('balance', $transaction["amount"]);
 
         }
 
         return true;
     }
+
 
     // public static function decrementExpenseSummary(){
     //     $response =  DB::table('splitwise_summary')

@@ -108,27 +108,19 @@ class SplitwiseController extends Controller
         $userInfo = app('userData');
 
         $data = array();
-        $expenseSummaryList = Splitwise::expenseSummaryList(true);
-        //$data["you_owe"] = Splitwise::expenseSummaryList(false); //You owe
-
+        $expenseSummaryList = Splitwise::expenseSummaryList();
         $data["ows_you"] = array();
         $data["you_owe"] = array();
+
         foreach ($expenseSummaryList as $expenseSummaryList_row) {
 
-            if($expenseSummaryList_row->from_user==$userInfo["id"]&&$expenseSummaryList_row->balance>0)
-            {
-                $data["ows_you"][] = array(
-                    "id"=>$expenseSummaryList_row->to_user,
-                    "name"=>$expenseSummaryList_row->to_user_name ,
-                    "balance"=>$expenseSummaryList_row->balance,
-                );
-
+            if($expenseSummaryList_row->balance>0){
+                $data["ows_you"][] = $expenseSummaryList_row;
             }else{
-                $data["you_owe"][] = array(
-                    "id"=>$expenseSummaryList_row->to_user,
-                    "name"=>$expenseSummaryList_row->to_user_name,
-                    "balance"=>$expenseSummaryList_row->balance
-                );
+
+                $temp_array = (array)$expenseSummaryList_row;
+                $temp_array["balance"] = abs($expenseSummaryList_row->balance);
+                $data["you_owe"][] = $temp_array;
             }
 
         }
