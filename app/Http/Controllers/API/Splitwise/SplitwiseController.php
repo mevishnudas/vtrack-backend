@@ -30,13 +30,21 @@ class SplitwiseController extends Controller
         $amount = $request->amount;
         $split_by = count($request->friends);
 
+        $ows_you = true;
         switch ($request->split_method) {
             case 'ows_you':
-                $split_amount = round($amount/$split_by,2);
+                $split_amount = $amount;
+
+                if($split_by>0){
+                    $split_amount = $amount/$split_by;
+                }
+
+                $split_amount = round($split_amount,2);
                 break;
 
             case 'you_ows':
                 # code...
+                $ows_you = false;
                 break;
 
             default:
@@ -49,15 +57,23 @@ class SplitwiseController extends Controller
         $transactions = array();
         foreach ($request->friends as $friend) {
 
+            $from_user = $ows_you?$userInfo["id"]:$friend;
+            $to_user = $ows_you?$friend:$userInfo["id"];
+
             $insert_data[] = array(
-                "friend_id"=>$friend,
+                "from_user"=>$from_user,
+                "to_user"=>$to_user,
+
                 "amount"=>$split_amount,
                 "remarks"=>$request->remarks,
-                "user_id"=>$userInfo["id"]
+
+                "user_id"=>$userInfo["id"] //who created the record
             );
 
             $transactions[] = array(
-                "friend_id"=>$friend,
+                "from_user"=>$from_user,
+                "to_user"=>$to_user,
+
                 "amount"=>$split_amount
             );
 
@@ -89,9 +105,33 @@ class SplitwiseController extends Controller
             return response(["status"=>401,"msg"=>"Invalid Parameters","data"=>$validator->errors()],401);
         }
 
+        $userInfo = app('userData');
+
         $data = array();
-        $data["ows_you"] = Splitwise::expenseSummaryList(true); //Ows you
-        $data["you_owe"] = Splitwise::expenseSummaryList(false); //You owe
+        $expenseSummaryList = Splitwise::expenseSummaryList(true);
+        //$data["you_owe"] = Splitwise::expenseSummaryList(false); //You owe
+
+        $data["ows_you"] = array();
+        $data["you_owe"] = array();
+        foreach ($expenseSummaryList as $expenseSummaryList_row) {
+
+            if($expenseSummaryList_row->from_user==$userInfo["id"]&&$expenseSummaryList_row->balance>0)
+            {
+                $data["ows_you"][] = array(
+                    "id"=>$expenseSummaryList_row->to_user,
+                    "name"=>$expenseSummaryList_row->to_user_name ,
+                    "balance"=>$expenseSummaryList_row->balance,
+                );
+
+            }else{
+                $data["you_owe"][] = array(
+                    "id"=>$expenseSummaryList_row->to_user,
+                    "name"=>$expenseSummaryList_row->to_user_name,
+                    "balance"=>$expenseSummaryList_row->balance
+                );
+            }
+
+        }
 
         return response(["status"=>200,"msg"=>"Success","data"=>$data],200);
     }

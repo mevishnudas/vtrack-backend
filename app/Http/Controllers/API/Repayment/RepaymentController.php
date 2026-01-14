@@ -123,10 +123,10 @@ class RepaymentController extends Controller
                 $data[] = array(
                     "id"=>$repaymentList_row->id,
 
-                    "amount"=>$repaymentList_row->amount,
-                    "pr_fee"=>$repaymentList_row->pr_fee,
-                    "charges"=>$repaymentList_row->charges,
-                    "total"=>$repaymentList_row->total,
+                    "amount"=>round($repaymentList_row->amount),
+                    "pr_fee"=>round($repaymentList_row->pr_fee),
+                    "charges"=>round($repaymentList_row->charges),
+                    "total"=>round($repaymentList_row->total),
 
                     "payment_date"=>$repaymentList_row->payment_date,
                     "distributed_date"=>$repaymentList_row->distributed_date,
@@ -218,9 +218,10 @@ class RepaymentController extends Controller
                     "payee_id"=>$emiList_row->payee_id,
                     "payee"=>$emiList_row->payee,
 
-                    "amount"=>$emiList_row->amount,
-                    "emi"=>$emiList_row->emi,
-                    "pr_fee"=>$emiList_row->pr_fee,
+                    "amount"=>round($emiList_row->amount),
+                    "emi"=>round($emiList_row->emi),
+                    "pr_fee"=>round($emiList_row->pr_fee),
+
                     "duration"=>$emiList_row->duration,
                     "paid"=>$emiList_row->paid,
 
@@ -255,7 +256,15 @@ class RepaymentController extends Controller
         }else{
 
             $emiSchedule = Repayment::emiSchedule($request->id);
-            return response(["status"=>200,"msg"=>"Success","data"=>$emiSchedule],200);
+
+            $result = collect($emiSchedule)
+                ->map(fn ($item) => [
+                    ...(array) $item,
+                    'amount' => round($item->amount),
+                ])
+            ->all();
+
+            return response(["status"=>200,"msg"=>"Success","data"=>$result],200);
         }
     }
 
