@@ -7,6 +7,28 @@ use DB;
 
 class Splitwise extends Model
 {
+
+    public static function expenseSummary(){
+        $userInfo = app('userData');
+
+        $data = array();
+        $data["ows_you"] = 0;
+        $data["you_owe"] = 0;
+
+        $data["you_owe"] = abs(DB::table("splitwise_summary")
+                            ->where("status",1)
+                            ->where("from_user",$userInfo["id"])
+                            ->where('balance', '<', 0)
+                            ->sum('balance'));
+
+        $data["ows_you"] = abs(DB::table("splitwise_summary")
+                            ->where("status",1)
+                            ->where("from_user",$userInfo["id"])
+                            ->where('balance', '>', 0)
+                            ->sum('balance'));
+        return $data;
+    }
+
     public static function expenseAdd($insert_data){
         $response = DB::table("splitwise_transactions")
                         ->insert($insert_data);

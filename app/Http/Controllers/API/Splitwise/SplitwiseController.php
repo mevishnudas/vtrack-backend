@@ -9,6 +9,17 @@ use App\Models\API\Splitwise\Splitwise;
 
 class SplitwiseController extends Controller
 {
+    public function expenseSummary(Request $request){
+        $expenseSummary = Splitwise::expenseSummary();
+
+        $data = array();
+        $data["ows_you"] = $expenseSummary["ows_you"];
+        $data["you_owe"] = $expenseSummary["you_owe"];
+        $data["total"] = abs($expenseSummary["ows_you"]+$expenseSummary["you_owe"]);
+
+        return response(["status"=>200,"msg"=>"Success","data"=>$data],200);
+    }
+
     public function expenseAdd(Request $request){
 
         $validator = Validator::make($request->all(), [
@@ -43,7 +54,6 @@ class SplitwiseController extends Controller
                 break;
 
             case 'you_ows':
-                # code...
                 $ows_you = false;
                 break;
 
