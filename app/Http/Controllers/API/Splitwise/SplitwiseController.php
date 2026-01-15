@@ -13,8 +13,8 @@ class SplitwiseController extends Controller
         $expenseSummary = Splitwise::expenseSummary();
 
         $data = array();
-        $data["ows_you"] = $expenseSummary["ows_you"];
-        $data["you_owe"] = $expenseSummary["you_owe"];
+        $data["ows_you"] = abs($expenseSummary["ows_you"]);
+        $data["you_owe"] = abs($expenseSummary["you_owe"]);
         $data["total"] = abs($expenseSummary["ows_you"]+$expenseSummary["you_owe"]);
 
         return response(["status"=>200,"msg"=>"Success","data"=>$data],200);
@@ -55,6 +55,14 @@ class SplitwiseController extends Controller
 
             case 'you_ows':
                 $ows_you = false;
+
+                $split_amount = $amount;
+
+                if($split_by>0){
+                    $split_amount = $amount/$split_by;
+                }
+
+                $split_amount = round($split_amount,2);
                 break;
 
             default:
@@ -119,6 +127,7 @@ class SplitwiseController extends Controller
 
         $data = array();
         $expenseSummaryList = Splitwise::expenseSummaryList();
+
         $data["ows_you"] = array();
         $data["you_owe"] = array();
 

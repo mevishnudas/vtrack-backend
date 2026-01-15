@@ -15,17 +15,17 @@ class Splitwise extends Model
         $data["ows_you"] = 0;
         $data["you_owe"] = 0;
 
-        $data["you_owe"] = abs(DB::table("splitwise_summary")
+        $data["you_owe"] = DB::table("splitwise_summary")
                             ->where("status",1)
                             ->where("from_user",$userInfo["id"])
                             ->where('balance', '<', 0)
-                            ->sum('balance'));
+                            ->sum('balance');
 
-        $data["ows_you"] = abs(DB::table("splitwise_summary")
+        $data["ows_you"] = DB::table("splitwise_summary")
                             ->where("status",1)
                             ->where("from_user",$userInfo["id"])
                             ->where('balance', '>', 0)
-                            ->sum('balance'));
+                            ->sum('balance');
         return $data;
     }
 
@@ -47,7 +47,8 @@ class Splitwise extends Model
             "splitwise_summary.balance"
         )
         ->where('splitwise_summary.from_user', $userInfo['id'])
-        ->where("splitwise_summary.status",1);
+        ->where("splitwise_summary.status",1)
+        ->whereNot("splitwise_summary.balance",0);
 
         $response = $query->get();
         return $response;
