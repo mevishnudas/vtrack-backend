@@ -31,7 +31,9 @@ Route::post('/repayment/emi/schedule/list',[RepaymentController::class,'emiSched
 #Splitwise
 Route::get('/splitwise/expense/summary',[SplitwiseController::class,'expenseSummary'])->middleware([ApiAuth::class]);
 Route::post('/splitwise/expense/add',[SplitwiseController::class,'expenseAdd'])->middleware([ApiAuth::class]);
+Route::post('/splitwise/expense/settle-up',[SplitwiseController::class,'expenseSettleUp'])->middleware([ApiAuth::class]);
 Route::post('/splitwise/expense/list',[SplitwiseController::class,'expenseList'])->middleware([ApiAuth::class]);
+Route::post('/splitwise/expense/transaction/list',[SplitwiseController::class,'expenseTransactionList'])->middleware([ApiAuth::class]);
 
 
 #Users

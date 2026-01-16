@@ -100,19 +100,56 @@ class SplitwiseController extends Controller
         if(!empty($insert_data))
         {
             $response = Splitwise::expenseAdd($insert_data);
-            self::incrementExpenseSummary($transactions);
+            self::modifyExpenseSummary($transactions);
         }
         return response(["status"=>200,"msg"=>"Success"],200);
     }
 
-    protected function incrementExpenseSummary($transactions){
+    protected function modifyExpenseSummary($transactions){
 
         foreach ($transactions as $transaction) {
-            Splitwise::incrementExpenseSummary($transaction);
+            Splitwise::modifyExpenseSummary($transaction);
         }
         return true;
     }
 
+    public function expenseSettleUp(Request $request){
+
+        $validator = Validator::make($request->all(), [
+            'friend' =>'required|numeric|exists:user,id',
+            'amount' =>'required|numeric|min:1',
+            'remarks'=>'present|nullable',
+        ]);
+
+        if ($validator->fails()) {
+            return response(["status"=>401,"msg"=>"Invalid Parameters","data"=>$validator->errors()],401);
+        }
+
+        //if validation fine
+        $userInfo = app('userData');
+
+        $insert_data = array(
+            "from_user"=>$request->friend,
+            "to_user"=>$userInfo["id"],
+
+            "amount"=>$request->amount,
+            "remarks"=>$request->remarks,
+
+            "user_id"=>$userInfo["id"] //who created the record
+        );
+
+        $transactions = array(
+            "from_user"=>$request->friend,
+            "to_user"=>$userInfo["id"],
+
+            "amount"=>$request->amount
+        );
+
+        $response = Splitwise::expenseAdd($insert_data);
+        self::modifyExpenseSummary([$transactions]);
+
+        return response(["status"=>200,"msg"=>"Success"],200);
+    }
 
     public function expenseList(Request $request){
         $validator = Validator::make($request->all(), [
@@ -147,6 +184,46 @@ class SplitwiseController extends Controller
         return response(["status"=>200,"msg"=>"Success","data"=>$data],200);
     }
 
+    public function expenseTransactionList(Request $request){
 
+        $validator = Validator::make($request->all(), [
+            'friend' =>'required|numeric|exists:user,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response(["status"=>401,"msg"=>"Invalid Parameters","data"=>$validator->errors()],401);
+        }else{
+
+            $userInfo = app('userData');
+            $expenseTransactionList = Splitwise::expenseTransactionList($request->friend);
+
+            $data = array();
+            foreach ($expenseTransactionList as $expenseTransactionList_row) {
+
+                $temp_array = array(
+                    "id"=>$expenseTransactionList_row->id,
+                    "date"=>date('d-M-Y',strtotime($expenseTransactionList_row->date)),
+                    "amount"=>$expenseTransactionList_row->amount,
+                    "remarks"=>$expenseTransactionList_row->remarks,
+                );
+
+                if($expenseTransactionList_row->from_user_id==$userInfo["id"]){
+                    //You paid
+                    $temp_array["name"] = $expenseTransactionList_row->to_user_name;
+                    $temp_array["payment_type"] = "PAID";
+                }else{
+                    //You received
+                    $temp_array["name"] = $expenseTransactionList_row->from_user_name;
+                    $temp_array["payment_type"] = "RECEIVED";
+                }
+
+                $data[] = $temp_array;
+
+            }
+
+            return response(["status"=>200,"msg"=>"Success","data"=>$data],200);
+        }
+
+    }
 //end class
 }
