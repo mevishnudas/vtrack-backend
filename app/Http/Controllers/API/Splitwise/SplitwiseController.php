@@ -202,7 +202,7 @@ class SplitwiseController extends Controller
 
                 $temp_array = array(
                     "id"=>$expenseTransactionList_row->id,
-                    "date"=>date('d-M-Y',strtotime($expenseTransactionList_row->date)),
+                    "date"=>date('Y-m-d H:i:s',strtotime($expenseTransactionList_row->date)),
                     "amount"=>$expenseTransactionList_row->amount,
                     "remarks"=>$expenseTransactionList_row->remarks,
                 );
