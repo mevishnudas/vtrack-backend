@@ -38,6 +38,7 @@ Route::post('/splitwise/expense/transaction/list',[SplitwiseController::class,'e
 
 #Users
 Route::get('/users/list',[UserController::class,'list'])->middleware([ApiAuth::class]);
+Route::post('/users/add',[UserController::class,'addUser'])->middleware([ApiAuth::class]);
 Route::get('/users/friends/list',[UserController::class,'friendsList'])->middleware([ApiAuth::class]);
 
 #Masters
