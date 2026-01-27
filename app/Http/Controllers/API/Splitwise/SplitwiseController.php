@@ -119,6 +119,7 @@ class SplitwiseController extends Controller
             'friend' =>'required|numeric|exists:user,id',
             'amount' =>'required|numeric|min:1',
             'remarks'=>'present|nullable',
+            'payment_mode'=>'required|in:PAID,RECEIVED'
         ]);
 
         if ($validator->fails()) {
@@ -128,19 +129,30 @@ class SplitwiseController extends Controller
         //if validation fine
         $userInfo = app('userData');
 
+        //Checking who settled up
+        $from_user = $userInfo["id"];
+        $to_user = $request->friend;
+
+        if($request->payment_mode=="RECEIVED"){
+            $from_user = $request->friend;
+            $to_user = $userInfo["id"];
+        }
+
         $insert_data = array(
-            "from_user"=>$request->friend,
-            "to_user"=>$userInfo["id"],
+            "from_user"=>$from_user,
+            "to_user"=>$to_user,
 
             "amount"=>$request->amount,
             "remarks"=>$request->remarks,
+
+            "payment_mode"=>"SETTLE_UP",
 
             "user_id"=>$userInfo["id"] //who created the record
         );
 
         $transactions = array(
-            "from_user"=>$request->friend,
-            "to_user"=>$userInfo["id"],
+            "from_user"=>$from_user,
+            "to_user"=>$to_user,
 
             "amount"=>$request->amount
         );
@@ -205,6 +217,7 @@ class SplitwiseController extends Controller
                     "date"=>date('Y-m-d H:i:s',strtotime($expenseTransactionList_row->date)),
                     "amount"=>$expenseTransactionList_row->amount,
                     "remarks"=>$expenseTransactionList_row->remarks,
+                    "payment_mode"=>$expenseTransactionList_row->payment_mode
                 );
 
                 if($expenseTransactionList_row->from_user_id==$userInfo["id"]){

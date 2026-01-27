@@ -181,6 +181,8 @@ class Splitwise extends Model
                         'splitwise_transactions.date',
                         'splitwise_transactions.amount',
                         'splitwise_transactions.remarks',
+
+                        'splitwise_transactions.payment_mode',
                     );
 
                     //$query->where('splitwise_transactions.from_user', $friend);

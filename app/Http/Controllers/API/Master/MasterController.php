@@ -13,6 +13,11 @@ class MasterController extends Controller
         return response(["status"=>200,"msg"=>"Success","data"=>$bankList],200);
     }
 
+    public function creditCardList(Request $request){
+        $bankList = Master::creditCardList();
+        return response(["status"=>200,"msg"=>"Success","data"=>$bankList],200);
+    }
+
     public function yearList(Request $request){
         $data = array();
         $data[] = 2023;

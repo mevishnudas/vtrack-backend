@@ -43,6 +43,7 @@ Route::get('/users/friends/list',[UserController::class,'friendsList'])->middlew
 
 #Masters
 Route::get('/master/bank/list',[MasterController::class,'bankList'])->middleware([ApiAuth::class]);
+Route::get('/master/credit-card/list',[MasterController::class,'creditCardList'])->middleware([ApiAuth::class]);
 Route::get('/master/year/list',[MasterController::class,'yearList'])->middleware([ApiAuth::class]);
 Route::get('/master/payment/status',[MasterController::class,'paymentStatus'])->middleware([ApiAuth::class]);
 Route::get('/master/emi/status',[MasterController::class,'emiStatus'])->middleware([ApiAuth::class]);
