@@ -17,18 +17,18 @@ class Master extends Model
         return $response;
     }
 
-    public static function creditCardList(){
-        $response = DB::table("bank")
-                    ->select(
-                        "id",
-                        "name",
-                        "nick_name",
-                        "last_digit",
-                        "color_code"
-                    )
-                    ->where("bank_type","CREDIT_CARD")
-                    ->where("status",1)
-                    ->get();
-        return $response;
-    }
+    // public static function creditCardList(){
+    //     $response = DB::table("bank")
+    //                 ->select(
+    //                     "id",
+    //                     "name",
+    //                     "nick_name",
+    //                     "last_digit",
+    //                     "color_code"
+    //                 )
+    //                 ->where("bank_type","CREDIT_CARD")
+    //                 ->where("status",1)
+    //                 ->get();
+    //     return $response;
+    // }
 }

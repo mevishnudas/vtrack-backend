@@ -9,6 +9,7 @@ use App\Http\Controllers\API\Repayment\RepaymentController;
 use App\Http\Controllers\API\Master\MasterController;
 use App\Http\Controllers\API\User\UserController;
 use App\Http\Controllers\API\Splitwise\SplitwiseController;
+use App\Http\Controllers\API\CreditCard\CreditCardController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -35,6 +36,9 @@ Route::post('/splitwise/expense/settle-up',[SplitwiseController::class,'expenseS
 Route::post('/splitwise/expense/list',[SplitwiseController::class,'expenseList'])->middleware([ApiAuth::class]);
 Route::post('/splitwise/expense/transaction/list',[SplitwiseController::class,'expenseTransactionList'])->middleware([ApiAuth::class]);
 
+#Credit Card
+Route::get('/credit-card/list',[CreditCardController::class,'list'])->middleware([ApiAuth::class]);
+Route::post('/credit-card/detail',[CreditCardController::class,'details'])->middleware([ApiAuth::class]);
 
 #Users
 Route::get('/users/list',[UserController::class,'list'])->middleware([ApiAuth::class]);
@@ -43,7 +47,7 @@ Route::get('/users/friends/list',[UserController::class,'friendsList'])->middlew
 
 #Masters
 Route::get('/master/bank/list',[MasterController::class,'bankList'])->middleware([ApiAuth::class]);
-Route::get('/master/credit-card/list',[MasterController::class,'creditCardList'])->middleware([ApiAuth::class]);
+//Route::get('/master/credit-card/list',[MasterController::class,'creditCardList'])->middleware([ApiAuth::class]);
 Route::get('/master/year/list',[MasterController::class,'yearList'])->middleware([ApiAuth::class]);
 Route::get('/master/payment/status',[MasterController::class,'paymentStatus'])->middleware([ApiAuth::class]);
 Route::get('/master/emi/status',[MasterController::class,'emiStatus'])->middleware([ApiAuth::class]);
