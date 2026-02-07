@@ -22,10 +22,14 @@ class CreditCardController extends Controller
         if ($validator->fails()) {
             return response(["status"=>401,"msg"=>"Invalid Parameters","data"=>$validator->errors()],401);
         }else{
+
             $data = array();
             $creditCard = CreditCard::creditCardInfo($request->id);
-            $data["card"] = array();
-            return response(["status"=>200,"msg"=>"Success","data"=>$creditCard],200);
+            $paymentHistory = CreditCard::creditCardPaymentHistory($request->id);
+
+            $data["card_info"] = $creditCard;
+            $data["payment_history"] = $paymentHistory;
+            return response(["status"=>200,"msg"=>"Success","data"=>$data],200);
         }
     }
 

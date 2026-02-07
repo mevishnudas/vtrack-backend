@@ -41,4 +41,25 @@ class CreditCard extends Model
         return $response;
     }
 
+    public static function creditCardPaymentHistory($id){
+
+        $userInfo = app('userData');
+        $response = DB::table('credit_card_payment_history')
+                    ->select(
+                        "id",
+                        "credit_card_id",
+                        "payment_date",
+                        "amount",
+                        "payment_status"
+                    )
+                    ->where("credit_card_id",$id)
+                    ->where("status",1)
+                    ->where("user_id",$userInfo['id'])
+                    ->orderBy("payment_date",'desc')
+                    ->limit(20)
+                    ->get();
+
+        return $response;
+    }
+
 }
