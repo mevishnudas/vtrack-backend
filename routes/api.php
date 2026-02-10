@@ -35,6 +35,7 @@ Route::post('/splitwise/expense/add',[SplitwiseController::class,'expenseAdd'])-
 Route::post('/splitwise/expense/settle-up',[SplitwiseController::class,'expenseSettleUp'])->middleware([ApiAuth::class]);
 Route::post('/splitwise/expense/list',[SplitwiseController::class,'expenseList'])->middleware([ApiAuth::class]);
 Route::post('/splitwise/expense/transaction/list',[SplitwiseController::class,'expenseTransactionList'])->middleware([ApiAuth::class]);
+Route::post('/splitwise/expense/friend/summary',[SplitwiseController::class,'expenseFriendSummary'])->middleware([ApiAuth::class]);
 
 #Credit Card
 Route::get('/credit-card/list',[CreditCardController::class,'list'])->middleware([ApiAuth::class]);

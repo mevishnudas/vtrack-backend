@@ -54,55 +54,6 @@ class Splitwise extends Model
         return $response;
     }
 
-    // public static function expenseSummaryListYouOws(){
-
-    //     $userInfo = app('userData');
-    //     $query = DB::table("splitwise_summary");
-    //     $query->join('user', 'user.id', '=', 'splitwise_summary.from_user');
-
-    //     $query->select(
-    //         "user.id",
-    //         "user.name",
-    //         "splitwise_summary.balance"
-    //     )
-    //     ->where('splitwise_summary.to_user', $userInfo['id'])
-    //     ->where("splitwise_summary.status",1);
-
-    //     $response = $query->get();
-    //     return $response;
-    // }
-
-    /*public static function expenseSummaryList($ows_you=true){
-
-        $userInfo = app('userData');
-        $query = DB::table("splitwise_summary");
-
-        if($ows_you){
-            $query->join('user', 'user.id', '=', 'splitwise_summary.to_user');
-        }else{
-            $query->join('user', 'user.id', '=', 'splitwise_summary.from_user');
-        }
-
-        $query->select(
-            "user.id",
-            "user.name",
-            "splitwise_summary.balance"
-        )
-        ->where('from_user', $userInfo['id'])
-        ->whereNot('user.id',$userInfo['id'])
-
-        ->where("splitwise_summary.status",1);
-
-        if($ows_you){
-            $query->where("splitwise_summary.balance",">",0);
-        }else{
-            $query->where("splitwise_summary.balance","<",0);
-        }
-
-        $response = $query->get();
-        return $response;
-    }*/
-
 
     public static function modifyExpenseSummary($transaction){
 
@@ -204,12 +155,25 @@ class Splitwise extends Model
         return $response;
     }
 
-    // public static function decrementExpenseSummary(){
-    //     $response =  DB::table('splitwise_summary')
-    //         ->where('id', $id)
-    //         ->decrement('amount', $addValue);
-    //     return $response;
-    // }
+    public static function expenseFriendSummary($friend_id){
+
+        $userInfo = app('userData');
+
+        $query = DB::table("splitwise_summary");
+        $query->join('user', 'user.id', '=', 'splitwise_summary.to_user');
+
+        $query->select(
+            "user.id",
+            "user.name",
+            "splitwise_summary.balance"
+        )
+        ->where('splitwise_summary.from_user', $userInfo['id'])
+        ->where('splitwise_summary.to_user', $friend_id)
+        ->where("splitwise_summary.status",1);
+
+        $response = $query->first();
+        return $response;
+    }
 
 
 }

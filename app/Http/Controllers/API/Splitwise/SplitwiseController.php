@@ -238,5 +238,76 @@ class SplitwiseController extends Controller
         }
 
     }
+
+    public function expenseFriendSummary(Request $request){
+
+        $validator = Validator::make($request->all(), [
+            'friend' =>'required|numeric|exists:user,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response(["status"=>401,"msg"=>"Invalid Parameters","data"=>$validator->errors()],401);
+        }else{
+
+            $data = array();
+            $userInfo = app('userData');
+
+            $expenseFriendSummary = Splitwise::expenseFriendSummary($request->friend);
+            if(empty($expenseFriendSummary)){
+                $data["summary"] = array();
+                $data["transactions"] = array();
+                return response(["status"=>200,"msg"=>"Success","data"=>$data],200);
+            }
+
+
+            if($expenseFriendSummary->balance>0){
+                $ows_status = "OWS_YOU";
+            }elseif($expenseFriendSummary->balance<0){
+                $ows_status = "YOU_OWS";
+            }else{
+                $ows_status = "SETTLED_UP";
+            }
+
+            $data["summary"] = array(
+                "id"=>$expenseFriendSummary->id,
+                "name"=>$expenseFriendSummary->name,
+                "balance"=>abs($expenseFriendSummary->balance),
+                "ows_status"=>$ows_status
+            );
+
+
+            $data["transactions"] = array();
+            $expenseTransactionList = Splitwise::expenseTransactionList($request->friend);
+            foreach ($expenseTransactionList as $expenseTransactionList_row) {
+
+                $temp_array = array(
+                    "id"=>$expenseTransactionList_row->id,
+                    "date"=>date('Y-m-d H:i:s',strtotime($expenseTransactionList_row->date)),
+                    "amount"=>$expenseTransactionList_row->amount,
+                    "remarks"=>(string)$expenseTransactionList_row->remarks,
+                    "payment_mode"=>$expenseTransactionList_row->payment_mode
+                );
+
+                if($expenseTransactionList_row->from_user_id==$userInfo["id"]){
+                    //You paid
+                    $temp_array["name"] = $expenseTransactionList_row->to_user_name;
+                    $temp_array["payment_type"] = "PAID";
+                }else{
+                    //You received
+                    $temp_array["name"] = $expenseTransactionList_row->from_user_name;
+                    $temp_array["payment_type"] = "RECEIVED";
+                }
+
+                $data["transactions"][] = $temp_array;
+
+            }
+
+            return response(["status"=>200,"msg"=>"Success","data"=>$data],200);
+        }
+
+        //end func
+    }
+
+
 //end class
 }
