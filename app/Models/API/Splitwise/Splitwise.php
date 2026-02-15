@@ -172,6 +172,25 @@ class Splitwise extends Model
         ->where("splitwise_summary.status",1);
 
         $response = $query->first();
+
+        if(empty($response)){
+            $response = self::settledFriendSummary($friend_id);
+        }
+        return $response;
+    }
+
+    public static function settledFriendSummary($friend_id){
+
+        $query = DB::table("user");
+        $query->select(
+            "user.id",
+            "user.name",
+            DB::raw("0 as balance")
+        )
+        ->where('user.id', $friend_id);
+        //->where("user.status",1);
+
+        $response = $query->first();
         return $response;
     }
 
