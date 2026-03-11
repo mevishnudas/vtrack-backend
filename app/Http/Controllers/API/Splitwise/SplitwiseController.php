@@ -117,7 +117,7 @@ class SplitwiseController extends Controller
 
         $validator = Validator::make($request->all(), [
             'friend' =>'required|numeric|exists:user,id',
-            'amount' =>'required|numeric|min:1',
+            'amount' =>'required|numeric|gt:0',
             'remarks'=>'present|nullable',
             'payment_mode'=>'required|in:PAID,RECEIVED'
         ]);
