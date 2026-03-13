@@ -188,11 +188,17 @@ class Splitwise extends Model
             DB::raw("0 as balance")
         )
         ->where('user.id', $friend_id);
-        //->where("user.status",1);
 
         $response = $query->first();
         return $response;
     }
 
+    public static function getTransactionDetail($id){
+        $response = DB::table("splitwise_transactions")
+                    ->where("id",$id)
+                    ->where("status",1)
+                    ->first();
+        return $response;
+    }
 
 }

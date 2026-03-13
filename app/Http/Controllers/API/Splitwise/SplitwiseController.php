@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\API\Splitwise\Splitwise;
+use Illuminate\Validation\Rule;
 
 class SplitwiseController extends Controller
 {
@@ -307,6 +308,37 @@ class SplitwiseController extends Controller
 
         //end func
     }
+
+    public function expenseFriendTransactionUpdate(Request $request){
+
+        $userInfo = app('userData');
+        $validator = Validator::make($request->all(), [
+            'id' => ['required',
+                Rule::exists('splitwise_transactions','id')->where(function ($query) use ($userInfo) {
+                $query->where('user_id', $userInfo["id"]);
+            })],
+            'amount' =>'required|numeric',
+            'remarks' =>'present|nullable',
+        ]);
+
+        if ($validator->fails()) {
+            return response(["status"=>401,"msg"=>"Invalid Parameters","data"=>$validator->errors()],401);
+        }else{
+            $transDetail = Splitwise::getTransactionDetail($request->id);
+
+            if($transDetail->from_user==$userInfo["id"]){
+                echo "Ows you";
+            }
+            elseif($transDetail->to_user==$userInfo["id"]){
+                echo "You owe";
+            }
+
+            return response(["status"=>200,"msg"=>"Success","data"=>$transDetail],200);
+        }
+
+        //end func
+    }
+
 
 
 //end class
