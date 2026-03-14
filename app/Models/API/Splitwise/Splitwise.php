@@ -201,4 +201,60 @@ class Splitwise extends Model
         return $response;
     }
 
+    public static function updateTransaction($update_data,$id){
+        $response = DB::table("splitwise_transactions")
+                    ->where("id",$id)
+                    ->where("status",1)
+                    ->update($update_data);
+        return $response;
+    }
+
+    public static function updateSummaryBalance($update_data,$sort_data){
+
+        $diff = $update_data["new_amount"] - $update_data["old_amount"];
+        //200-800 = -600 OR 900-800 = 100 🧮
+
+        //Increment
+        $query =  DB::table('splitwise_summary')
+                      ->where('from_user', $sort_data["from_user"])
+                      ->where('to_user', $sort_data["to_user"])
+                      ->increment('balance', $diff);
+
+        //Decrement
+        $query02 =  DB::table('splitwise_summary')
+                      ->where('to_user', $sort_data["from_user"])
+                      ->where('from_user', $sort_data["to_user"])
+                      ->decrement('balance', $diff);
+
+        return true;
+    }
+
+    public static function deleteTransaction($id,$user_id){
+        $response = DB::table("splitwise_transactions")
+                    ->where("id",$id)
+                    ->where("status",1)
+                    ->where("user_id",$user_id)
+                    ->delete();
+        return $response;
+    }
+
+    public static function removeFromSummaryBalance($sort_data){
+
+        //Decrement
+        $query =  DB::table('splitwise_summary')
+                      ->where('from_user', $sort_data["from_user"])
+                      ->where('to_user', $sort_data["to_user"])
+                      ->decrement('balance', $sort_data["amount"]);
+
+        //Increment
+        $query02 =  DB::table('splitwise_summary')
+                      ->where('to_user', $sort_data["from_user"])
+                      ->where('from_user', $sort_data["to_user"])
+                      ->increment('balance', $sort_data["amount"]);
+
+        return true;
+    }
+
+
+
 }

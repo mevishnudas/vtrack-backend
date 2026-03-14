@@ -317,28 +317,70 @@ class SplitwiseController extends Controller
                 Rule::exists('splitwise_transactions','id')->where(function ($query) use ($userInfo) {
                 $query->where('user_id', $userInfo["id"]);
             })],
-            'amount' =>'required|numeric',
+            'amount' =>'required|numeric|gt:0',
             'remarks' =>'present|nullable',
         ]);
 
         if ($validator->fails()) {
             return response(["status"=>401,"msg"=>"Invalid Parameters","data"=>$validator->errors()],401);
         }else{
+
             $transDetail = Splitwise::getTransactionDetail($request->id);
 
-            if($transDetail->from_user==$userInfo["id"]){
-                echo "Ows you";
-            }
-            elseif($transDetail->to_user==$userInfo["id"]){
-                echo "You owe";
-            }
+            #Replace new amount
+            $update_data = array(
+                "amount"=>$request->amount,
+                "remarks"=>$request->remarks
+            );
+            Splitwise::updateTransaction($update_data,$transDetail->id);
 
-            return response(["status"=>200,"msg"=>"Success","data"=>$transDetail],200);
+            //Decrement & Increment old amount and add new amount
+            $update_data = array(
+                "old_amount"=>$transDetail->amount,
+                "new_amount"=>$request->amount
+            );
+            $sort_data = array(
+                "from_user"=>$transDetail->from_user,
+                "to_user"=>$transDetail->to_user
+            );
+
+            Splitwise::updateSummaryBalance($update_data,$sort_data);
+
+            return response(["status"=>200,"msg"=>"Success"],200);
         }
-
         //end func
     }
 
+    public function expenseFriendTransactionDelete(Request $request){
+
+        $userInfo = app('userData');
+        $validator = Validator::make($request->all(), [
+            'id' => ['required',
+                Rule::exists('splitwise_transactions','id')->where(function ($query) use ($userInfo) {
+                $query->where('user_id', $userInfo["id"]);
+            })],
+        ]);
+
+        if ($validator->fails()) {
+            return response(["status"=>401,"msg"=>"Invalid Parameters","data"=>$validator->errors()],401);
+        }else{
+
+            $transDetail = Splitwise::getTransactionDetail($request->id);
+
+            //Decrement & Increment amount
+            $sort_data = array(
+                "from_user"=>$transDetail->from_user,
+                "to_user"=>$transDetail->to_user,
+                "amount"=>$transDetail->amount
+            );
+            Splitwise::removeFromSummaryBalance($sort_data);
+
+            //Delete Transaction
+            Splitwise::deleteTransaction($request->id,$userInfo["id"]);
+
+            return response(["status"=>200,"msg"=>"Success"],200);
+        }
+    }
 
 
 //end class
