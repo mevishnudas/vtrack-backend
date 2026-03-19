@@ -286,7 +286,8 @@ class SplitwiseController extends Controller
                     "date"=>date('Y-m-d H:i:s',strtotime($expenseTransactionList_row->date)),
                     "amount"=>$expenseTransactionList_row->amount,
                     "remarks"=>(string)$expenseTransactionList_row->remarks,
-                    "payment_mode"=>$expenseTransactionList_row->payment_mode
+                    "payment_mode"=>$expenseTransactionList_row->payment_mode,
+                    "edit"=>$expenseTransactionList_row->user_id==$userInfo["id"]?true:false
                 );
 
                 if($expenseTransactionList_row->from_user_id==$userInfo["id"]){
