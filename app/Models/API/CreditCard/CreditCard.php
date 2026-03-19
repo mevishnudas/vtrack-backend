@@ -13,12 +13,21 @@ class CreditCard extends Model
         $response = DB::table("bank")
                     ->select(
                         "bank.id",
-                        "bank.nick_name as name",
-                        "bank.last_digit"
+                        "bank.name",
+                        "bank.variant_name",
+                        "bank.last_digit",
+
+                        "credit_card_payment_history.payment_date",
+                        "credit_card_payment_history.amount",
+                        "credit_card_payment_history.payment_status"
                     )
-                    ->where("bank_type","CREDIT_CARD")
-                    ->where("status",1)
-                    ->where("user_id",$userInfo['id'])
+                    ->leftJoin('credit_card_payment_history', 'bank.id', '=', 'credit_card_payment_history.credit_card_id')
+                    ->where("bank.bank_type","CREDIT_CARD")
+                    ->where("bank.status",1)
+                    ->where("bank.user_id",$userInfo['id'])
+                    //->groupBy('bank.id');
+                    //->distinct()
+                    //->groupBy('bank.id', 'bank.name')
                     ->get();
         return $response;
     }
@@ -30,7 +39,8 @@ class CreditCard extends Model
         $response = DB::table('bank')
                     ->select(
                         "bank.id",
-                        "bank.nick_name as name",
+                        "bank.name",
+                        "bank.variant_name",
                         "bank.last_digit"
                     )
                     ->where("id",$id)

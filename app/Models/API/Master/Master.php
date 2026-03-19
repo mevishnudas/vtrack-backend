@@ -11,7 +11,8 @@ class Master extends Model
         $response = DB::table("bank")
                     ->select(
                         "id",
-                        "name"
+                        "name",
+                        "variant_name"
                     )
                     ->where("status",1)->get();
         return $response;
