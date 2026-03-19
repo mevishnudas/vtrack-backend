@@ -197,7 +197,8 @@ class RepaymentController extends Controller
             //"year"=>'required|numeric|min:2023|max:2026',
             //"month"=>'required|numeric|min:1|max:12',
             "status"=>'required|string|in:OPEN,CLOSED,PRE_CLOSED',
-            "payee"=>'sometimes|nullable|exclude_if:payee,0|integer|exists:user,id'
+            "payee"=>'sometimes|nullable|exclude_if:payee,0|integer|exists:user,id',
+            "bank"=>'sometimes|nullable|exclude_if:bank,0|integer|exists:bank,id'
         ]);
         if ($validator->fails()) {
             return response(["status"=>401,"msg"=>"Invalid Parameters","data"=>$validator->errors()],401);
@@ -207,6 +208,7 @@ class RepaymentController extends Controller
             $sort_data = array();
             $sort_data["status"] = $request->status;
             $sort_data["payee"] = $request->payee;
+            $sort_data["bank"] = $request->bank;
 
             $emiList = Repayment::emiList($sort_data);
 

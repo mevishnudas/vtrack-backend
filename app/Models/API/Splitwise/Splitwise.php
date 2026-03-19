@@ -134,6 +134,7 @@ class Splitwise extends Model
                         'splitwise_transactions.remarks',
 
                         'splitwise_transactions.payment_mode',
+                        'splitwise_transactions.user_id',
                     );
 
                     //$query->where('splitwise_transactions.from_user', $friend);
