@@ -65,10 +65,16 @@ class CreditCard extends Model
                     ->where("credit_card_id",$id)
                     ->where("status",1)
                     ->where("user_id",$userInfo['id'])
-                    ->orderBy("payment_date",'desc')
+                    ->orderBy("payment_date",'asc')
                     ->limit(20)
                     ->get();
 
+        return $response;
+    }
+
+    public static function addToPaymentHistory($insert_data){
+        $response = DB::table("credit_card_payment_history")
+                    ->insertGetId($insert_data);
         return $response;
     }
 

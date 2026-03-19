@@ -43,6 +43,7 @@ Route::post('/splitwise/expense/friend/transaction/delete',[SplitwiseController:
 #Credit Card
 Route::get('/credit-card/list',[CreditCardController::class,'list'])->middleware([ApiAuth::class]);
 Route::post('/credit-card/detail',[CreditCardController::class,'details'])->middleware([ApiAuth::class]);
+Route::post('/credit-card/bill/add',[CreditCardController::class,'billAdd'])->middleware([ApiAuth::class]);
 
 #Users
 Route::get('/users/list',[UserController::class,'list'])->middleware([ApiAuth::class]);
