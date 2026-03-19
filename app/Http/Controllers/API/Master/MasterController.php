@@ -9,8 +9,22 @@ use App\Models\API\Master\Master;
 class MasterController extends Controller
 {
     public function bankList(Request $request){
+        $data = array();
         $bankList = Master::bankList();
-        return response(["status"=>200,"msg"=>"Success","data"=>$bankList],200);
+        foreach ($bankList as $bankList_row) {
+
+            $name = $bankList_row->name;
+            if(!empty($bankList_row->variant_name)){
+                $name.=" (".$bankList_row->variant_name.")";
+            }
+
+            $data[] = array(
+                "id"=>$bankList_row->id,
+                "name"=>$name,
+                "variant_name"=>$bankList_row->variant_name
+            );
+        }
+        return response(["status"=>200,"msg"=>"Success","data"=>$data],200);
     }
 
     // public function creditCardList(Request $request){

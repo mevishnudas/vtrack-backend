@@ -105,6 +105,10 @@ class Repayment extends Model
 
                         //Filter by user
                         ->when($sort_data["payee"],fn($q)=>$q->where("repayment_emi.payee",$sort_data["payee"]))
+
+                        //Filter by bank
+                        ->when($sort_data["bank"],fn($q)=>$q->where("repayment_emi.source",$sort_data["bank"]))
+
                         ->get();
 
         return $response;

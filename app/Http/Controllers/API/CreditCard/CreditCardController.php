@@ -10,8 +10,10 @@ use Illuminate\Support\Facades\Validator;
 class CreditCardController extends Controller
 {
     public function list(){
+
         $creditCardList = CreditCard::creditCardList();
-        return response(["status"=>200,"msg"=>"Success","data"=>$creditCardList],200);
+        $data = collect($creditCardList)->unique('id')->values();
+        return response(["status"=>200,"msg"=>"Success","data"=>$data],200);
     }
 
     public function details(Request $request){
