@@ -44,6 +44,8 @@ Route::post('/splitwise/expense/friend/transaction/delete',[SplitwiseController:
 Route::get('/credit-card/list',[CreditCardController::class,'list'])->middleware([ApiAuth::class]);
 Route::post('/credit-card/detail',[CreditCardController::class,'details'])->middleware([ApiAuth::class]);
 Route::post('/credit-card/bill/add',[CreditCardController::class,'billAdd'])->middleware([ApiAuth::class]);
+Route::post('/credit-card/bill/update',[CreditCardController::class,'billUpdate'])->middleware([ApiAuth::class]);
+Route::post('/credit-card/bill/delete',[CreditCardController::class,'billDelete'])->middleware([ApiAuth::class]);
 
 #Users
 Route::get('/users/list',[UserController::class,'list'])->middleware([ApiAuth::class]);
@@ -55,6 +57,7 @@ Route::get('/master/bank/list',[MasterController::class,'bankList'])->middleware
 //Route::get('/master/credit-card/list',[MasterController::class,'creditCardList'])->middleware([ApiAuth::class]);
 Route::get('/master/year/list',[MasterController::class,'yearList'])->middleware([ApiAuth::class]);
 Route::get('/master/payment/status',[MasterController::class,'paymentStatus'])->middleware([ApiAuth::class]);
+Route::get('/master/credit-card/payment/status',[MasterController::class,'creditCardPaymentStatusList'])->middleware([ApiAuth::class]);
 Route::get('/master/emi/status',[MasterController::class,'emiStatus'])->middleware([ApiAuth::class]);
 Route::get('/master/emi/principle/status',[MasterController::class,'emiPrincipleStatus'])->middleware([ApiAuth::class]);
 Route::post('/master/emi/status/update',[RepaymentController::class,'emiStatusUpdate'])->middleware([ApiAuth::class]);

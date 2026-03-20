@@ -118,9 +118,11 @@ class MasterController extends Controller
         );
 
         $data[] = array(
-            "label"=>"Paid Verified",
+            "label"=>"Paid & Verified",
             "value"=>"PAID_VERIFIED"
         );
+
+        return response(["status"=>200,"msg"=>"Success","data"=>$data],200);
 
     }
 

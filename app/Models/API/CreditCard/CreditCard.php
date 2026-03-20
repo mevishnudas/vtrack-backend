@@ -79,4 +79,19 @@ class CreditCard extends Model
         return $response;
     }
 
+    public static function updatePaymentHistory($update_data,$id){
+        $response = DB::table("credit_card_payment_history")
+                    ->where("id",$id)
+                    ->update($update_data);
+        return $response;
+    }
+
+
+    public static function deletePaymentHistory($id){
+        $response = DB::table("credit_card_payment_history")
+                    ->where("id",$id)
+                    ->delete();
+        return $response;
+    }
+
 }

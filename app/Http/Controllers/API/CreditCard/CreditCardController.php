@@ -68,5 +68,50 @@ class CreditCardController extends Controller
 
     }
 
+    public function billUpdate(Request $request){
+
+        $userInfo = app('userData');
+        $validator = Validator::make($request->all(), [
+            'id' => ['required',
+                Rule::exists('credit_card_payment_history','id')->where(function ($query) use ($userInfo) {
+                    $query->where('user_id', $userInfo["id"]);
+            })],
+            'amount'=>'required|numeric',
+            'payment_date'=>'required|date',
+            'payment_status'=>'required|in:PENDING,PAID,PARTIALLY_PAID,PAID_VERIFIED',
+            'remarks'=>'present|nullable'
+        ]);
+        if ($validator->fails()) {
+            return response(["status"=>401,"msg"=>"Invalid Parameters","data"=>$validator->errors()],401);
+        }else{
+
+            $update_data = array(
+                "amount"=>$request->amount,
+                "payment_date"=>date('Y-m-d',strtotime($request->payment_date)),
+                "payment_status"=>$request->payment_status,
+                "remarks"=>$request->remarks
+            );
+            CreditCard::updatePaymentHistory($update_data,$request->id);
+            return response(["msg"=>"Success"],200);
+        }
+    }
+
+
+    public function billDelete(Request $request){
+
+        $userInfo = app('userData');
+        $validator = Validator::make($request->all(), [
+            'id' => ['required',
+                Rule::exists('credit_card_payment_history','id')->where(function ($query) use ($userInfo) {
+                    $query->where('user_id', $userInfo["id"]);
+            })]
+        ]);
+        if ($validator->fails()) {
+            return response(["status"=>401,"msg"=>"Invalid Parameters","data"=>$validator->errors()],401);
+        }else{
+            CreditCard::deletePaymentHistory($request->id);
+            return response(["msg"=>"Success"],200);
+        }
+    }
 
 }
