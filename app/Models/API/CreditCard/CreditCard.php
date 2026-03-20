@@ -60,7 +60,8 @@ class CreditCard extends Model
                         "credit_card_id",
                         "payment_date",
                         "amount",
-                        "payment_status"
+                        "payment_status",
+                        "remarks"
                     )
                     ->where("credit_card_id",$id)
                     ->where("status",1)
