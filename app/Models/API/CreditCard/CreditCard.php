@@ -27,7 +27,7 @@ class CreditCard extends Model
                     ->where("bank.user_id",$userInfo['id'])
                     //->groupBy('bank.id');
                     //->distinct()
-                    //->groupBy('bank.id', 'bank.name')
+                    ->orderBy('credit_card_payment_history.payment_date', 'desc')
                     ->get();
         return $response;
     }
@@ -66,7 +66,7 @@ class CreditCard extends Model
                     ->where("credit_card_id",$id)
                     ->where("status",1)
                     ->where("user_id",$userInfo['id'])
-                    ->orderBy("payment_date",'asc')
+                    ->orderBy("payment_date",'desc')
                     ->limit(20)
                     ->get();
 
