@@ -13,9 +13,29 @@ class CreditCardController extends Controller
     public function list(){
 
         $creditCardList = CreditCard::creditCardList();
-        //$data = collect($creditCardList)->unique('id')->values();
-        $data = collect($creditCardList)->unique('id')->sortBy('payment_date')->values();
-        return response(["status"=>200,"msg"=>"Success","data"=>$creditCardList],200);
+
+        $creditCardIds = collect($creditCardList)->pluck('id')->values();
+        $paymentHistory = CreditCard::creditCardPaymentHistoryLatest($creditCardIds);
+
+        $data = array();
+        foreach ($creditCardList as $creditCardList_row) {
+
+            $latestPayment = collect($paymentHistory)->where("credit_card_id",$creditCardList_row->id)->first();
+
+            $data[] = array(
+                "id"=>$creditCardList_row->id,
+                "name"=>$creditCardList_row->name,
+                "variant_name"=>$creditCardList_row->variant_name,
+                "last_digit"=>$creditCardList_row->last_digit,
+
+                "payment_date"=>(string)@$latestPayment->payment_date,
+                "amount"=>(string)@$latestPayment->amount,
+                "payment_status"=>(string)@$latestPayment->payment_status
+            );
+        }
+
+        $data = collect($data)->sortBy("payment_date")->values();
+        return response(["status"=>200,"msg"=>"Success","data"=>$data],200);
     }
 
     public function details(Request $request){
