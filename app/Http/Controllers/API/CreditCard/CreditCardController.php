@@ -12,6 +12,11 @@ class CreditCardController extends Controller
 {
     public function list(){
 
+        $data = self::creditCardPaymentSummary();
+        return response(["status"=>200,"msg"=>"Success","data"=>$data],200);
+    }
+
+    public static function creditCardPaymentSummary() {
         $creditCardList = CreditCard::creditCardList();
 
         $creditCardIds = collect($creditCardList)->pluck('id')->values();
@@ -35,7 +40,7 @@ class CreditCardController extends Controller
         }
 
         $data = collect($data)->sortBy("payment_date")->values();
-        return response(["status"=>200,"msg"=>"Success","data"=>$data],200);
+        return $data;
     }
 
     public function details(Request $request){

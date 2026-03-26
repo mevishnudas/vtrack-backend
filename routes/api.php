@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\ApiAuth;
 
 use App\Http\Controllers\API\Login\LoginController;
+use App\Http\Controllers\API\Dashboard\DashboardController;
 use App\Http\Controllers\API\Repayment\RepaymentController;
 use App\Http\Controllers\API\Master\MasterController;
 use App\Http\Controllers\API\User\UserController;
@@ -18,10 +19,14 @@ use App\Http\Controllers\API\CreditCard\CreditCardController;
 Route::post('/login',[LoginController::class,'login']);
 Route::get('/token/validate',[LoginController::class,'tokenValidate'])->middleware([ApiAuth::class]);
 
+#Dashboard
+Route::get('/dashboard/summary',[DashboardController::class,'summary'])->middleware([ApiAuth::class]);
+
 #Repayment
 Route::post('/repayment/list',[RepaymentController::class,'list'])->middleware([ApiAuth::class]);
 Route::post('/repayment/add',[RepaymentController::class,'addNew'])->middleware([ApiAuth::class]);
 Route::post('/repayment/update',[RepaymentController::class,'update'])->middleware([ApiAuth::class]);
+
 #EMI
 Route::post('/repayment/emi/add',[RepaymentController::class,'emiAdd'])->middleware([ApiAuth::class]);
 Route::post('/repayment/emi/list',[RepaymentController::class,'emiList'])->middleware([ApiAuth::class]);

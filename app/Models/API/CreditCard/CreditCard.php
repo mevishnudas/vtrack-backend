@@ -24,6 +24,23 @@ class CreditCard extends Model
         return $response;
     }
 
+    // public static function creditCardCount(){
+
+    //     $userInfo = app('userData');
+    //     $response = DB::table("bank")
+    //                 ->select(
+    //                     "bank.id",
+    //                     "bank.name",
+    //                     "bank.variant_name",
+    //                     "bank.last_digit",
+    //                 )
+    //                 ->where("bank.bank_type","CREDIT_CARD")
+    //                 ->where("bank.status",1)
+    //                 ->where("bank.user_id",$userInfo['id'])
+    //                 ->count();
+    //     return $response;
+    // }
+
     public static function creditCardPaymentHistoryLatest($ids){
 
         $latestRecords = DB::table('credit_card_payment_history')
