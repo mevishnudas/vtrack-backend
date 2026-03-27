@@ -162,4 +162,12 @@ class Repayment extends Model
                         ->update($insert_data);
         return $response;
     }
+
+    public static function repaymentByDate($sort_data){
+        $response = DB::table("repayment")
+                        ->select("id","payment_status","payment_date")
+                        ->whereBetween("payment_date",[$sort_data["start_date"],$sort_data["end_date"]])
+                        ->get();
+        return $response;
+    }
 }

@@ -1,11 +1,12 @@
 <?php
 
 namespace App\Http\Controllers\API\Dashboard;
-
+use Carbon\Carbon;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\API\CreditCard\CreditCard;
 use App\Http\Controllers\API\CreditCard\CreditCardController;
+use App\Models\API\Repayment\Repayment;
 
 class DashboardController extends Controller
 {
@@ -13,33 +14,7 @@ class DashboardController extends Controller
 
         $data = array();
         $data["credit_summary"] = self::creditCardSummary();
-
-        $data["repayment_summary"] = array(
-            "today"=>array(
-                "total"=>0,
-                "received"=>0,
-                "pending"=>0,
-                "partially"=>0
-            ),
-            "tomorrow"=>array(
-                "total"=>0,
-                "received"=>0,
-                "pending"=>0,
-                "partially"=>0
-            ),
-            "this_month"=>array(
-                "total"=>0,
-                "received"=>0,
-                "pending"=>0,
-                "partially"=>0
-            ),
-            "last_month"=>array(
-                "total"=>0,
-                "received"=>0,
-                "pending"=>0,
-                "partially"=>0
-            )
-        );
+        $data["repayment_summary"] = self::repaymentSummary();
         return response(["msg"=>"Success","data"=>$data],200);
     }
 
@@ -55,4 +30,128 @@ class DashboardController extends Controller
 
         return $data;
     }
+
+    public function repaymentSummary(){
+
+        $sort_data = array();
+        // This month last date
+        $sort_data["start_date"] = Carbon::now()->subMonth()->startOfMonth()->toDateString();
+        // Last month first date
+        $sort_data["end_date"] = Carbon::now()->endOfMonth()->addDay()->toDateString();
+
+        $repaymentTodayAndTomorrow = Repayment::repaymentByDate($sort_data);
+
+        $current_date = date('Y-m-d');
+        $tomorrow_date = date('Y-m-d',strtotime('+ 1 Day'));
+        $today = array("total"=>0,"received"=>0,"pending"=>0,"partially"=>0);
+        $tomorrow = array("total"=>0,"received"=>0,"pending"=>0,"partially"=>0);
+        $this_month = array("total"=>0,"received"=>0,"pending"=>0,"partially"=>0);
+        $last_month = array("total"=>0,"received"=>0,"pending"=>0,"partially"=>0);
+        foreach ($repaymentTodayAndTomorrow as $repaymentTodayAndTomorrow_row) {
+
+            #Today
+            if($repaymentTodayAndTomorrow_row->payment_date==$current_date){
+
+                $today["total"]+=1;
+                switch ($repaymentTodayAndTomorrow_row->payment_status) {
+                    case 'RECEIVED':
+                        $today["received"]+=1;
+                        break;
+
+                    case 'PARTIALLY_PAID':
+                        $today["partially"]+=1;
+                    default:
+                        $today["pending"]+=1;
+                        break;
+                }
+
+            }
+
+            #Tomorrow
+            if($repaymentTodayAndTomorrow_row->payment_date==$tomorrow_date){
+                $tomorrow[] = $repaymentTodayAndTomorrow_row;
+                $tomorrow["total"]+=1;
+                switch ($repaymentTodayAndTomorrow_row->payment_status) {
+                    case 'RECEIVED':
+                        $tomorrow["received"]+=1;
+                        break;
+
+                    case 'PARTIALLY_PAID':
+                        $tomorrow["partially"]+=1;
+                    default:
+                        $tomorrow["pending"]+=1;
+                        break;
+                }
+            }
+
+            #This Month
+            $record_date = Carbon::parse($repaymentTodayAndTomorrow_row->payment_date);
+            if($record_date->isSameMonth(Carbon::now())){
+
+                $this_month["total"] +=1;
+                switch ($repaymentTodayAndTomorrow_row->payment_status) {
+                    case 'RECEIVED':
+                        $this_month["received"]+=1;
+                        break;
+
+                    case 'PARTIALLY_PAID':
+                        $this_month["partially"]+=1;
+                    default:
+                        $this_month["pending"]+=1;
+                        break;
+                }
+
+            }
+
+            #Last Month
+            if($record_date->isSameMonth(Carbon::now()->subMonth()))
+            {
+                $last_month["total"] +=1;
+                switch ($repaymentTodayAndTomorrow_row->payment_status) {
+                    case 'RECEIVED':
+                        $last_month["received"]+=1;
+                        break;
+
+                    case 'PARTIALLY_PAID':
+                        $last_month["partially"]+=1;
+                    default:
+                        $last_month["pending"]+=1;
+                        break;
+                }
+            }
+        }
+
+        #Save to Data
+        $data = array(
+            "today"=>array(
+                "total"=>$today["total"],
+                "received"=>$today["received"],
+                "pending"=>$today["pending"],
+                "partially"=>$today["partially"]
+            ),
+            "tomorrow"=>array(
+                "total"=>$tomorrow["total"],
+                "received"=>$tomorrow["received"],
+                "pending"=>$tomorrow["pending"],
+                "partially"=>$tomorrow["partially"]
+            ),
+            "this_month"=>array(
+                "total"=>$this_month["total"],
+                "received"=>$this_month["received"],
+                "pending"=>$this_month["pending"],
+                "partially"=>$this_month["partially"]
+            ),
+            "last_month"=>array(
+                "total"=>$last_month["total"],
+                "received"=>$last_month["received"],
+                "pending"=>$last_month["pending"],
+                "partially"=>$last_month["partially"]
+            )
+        );
+
+        return $data;
+    }
+
+
+
 }
