@@ -15,6 +15,7 @@ class DashboardController extends Controller
         $data = array();
         $data["credit_summary"] = self::creditCardSummary();
         $data["repayment_summary"] = self::repaymentSummary();
+        $data["emi_summary"] = self::emiSummary();
         return response(["msg"=>"Success","data"=>$data],200);
     }
 
@@ -152,6 +153,87 @@ class DashboardController extends Controller
         return $data;
     }
 
+    public function emiSummary(){
 
+        $sort_data = array();
+        // This month last date
+        $sort_data["start_date"] = Carbon::now()->subMonth()->startOfMonth()->toDateString();
+        // Last month first date
+        $sort_data["end_date"] = Carbon::now()->endOfMonth()->toDateString();
+
+        $response = Repayment::repaymentEMIByDate($sort_data);
+
+        $data = array(
+            "this_month"=>array(
+                "opened"=>0,
+                "closed"=>0,
+                "pre_closed"=>0
+            ),
+            "last_month"=>array(
+                "opened"=>0,
+                "closed"=>0,
+                "pre_closed"=>0
+            )
+        );
+
+        #Opened
+        foreach ($response["opened"] as $opened) {
+            #This Month
+            $record_date = Carbon::parse($opened->distributed_date);
+            if($record_date->isSameMonth(Carbon::now())){
+                $data["this_month"]["opened"] +=1;
+            }
+
+            #Last Month
+            $record_date = Carbon::parse($opened->distributed_date);
+            if($record_date->isSameMonth(Carbon::now()->subMonth())){
+                $data["last_month"]["opened"] +=1;
+            }
+        }
+
+        #Closed
+        foreach ($response["closed"] as $closed) {
+            #This Month
+            $record_date = Carbon::parse($closed->status_change_date);
+            if($record_date->isSameMonth(Carbon::now())){
+
+                switch ($closed->emi_status) {
+                    case 'CLOSED':
+                        $data["this_month"]["closed"] +=1;
+                        break;
+
+                    case 'PRE_CLOSED':
+                        $data["this_month"]["pre_closed"] +=1;
+                        break;
+                    default:
+                        # code...
+                        break;
+                }
+
+            }
+
+            #Last Month
+            $record_date = Carbon::parse($closed->status_change_date);
+            if($record_date->isSameMonth(Carbon::now()->subMonth())){
+
+                switch ($closed->emi_status) {
+                    case 'CLOSED':
+                        $data["last_month"]["closed"] +=1;
+                        break;
+
+                    case 'PRE_CLOSED':
+                        $data["last_month"]["pre_closed"] +=1;
+                        break;
+                    default:
+                        # code...
+                        break;
+                }
+
+            }
+        }
+
+        return $data;
+
+    }
 
 }

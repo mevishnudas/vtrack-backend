@@ -170,4 +170,19 @@ class Repayment extends Model
                         ->get();
         return $response;
     }
+
+    public static function repaymentEMIByDate($sort_data){
+        $data = array();
+        $data["opened"] = DB::table("repayment_emi")
+                        ->select("id","distributed_date")
+                        ->whereBetween("distributed_date",[$sort_data["start_date"],$sort_data["end_date"]])
+                        ->get();
+
+        $data["closed"] = DB::table("repayment_emi")
+                ->select("id","emi_status","status_change_date")
+                ->whereBetween("status_change_date",[$sort_data["start_date"],$sort_data["end_date"]])
+                ->get();
+        return $data;
+    }
+
 }

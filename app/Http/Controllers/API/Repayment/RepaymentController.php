@@ -342,7 +342,8 @@ class RepaymentController extends Controller
             $update_data = array(
                 "paid"=>$request->paid,
                 "emi_status"=>$request->status,
-                "remarks"=>$request->remarks
+                "remarks"=>$request->remarks,
+                "status_change_date"=>date('Y-m-d H:i:s')
             );
             Repayment::updateEMIStatus($update_data,$request->id);
 

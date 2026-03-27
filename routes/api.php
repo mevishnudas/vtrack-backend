@@ -33,6 +33,7 @@ Route::post('/repayment/emi/list',[RepaymentController::class,'emiList'])->middl
 Route::post('/repayment/emi/schedule/add',[RepaymentController::class,'emiScheduleAdd'])->middleware([ApiAuth::class]);
 Route::post('/repayment/emi/schedule/update',[RepaymentController::class,'emiScheduleUpdate'])->middleware([ApiAuth::class]);
 Route::post('/repayment/emi/schedule/list',[RepaymentController::class,'emiScheduleList'])->middleware([ApiAuth::class]);
+Route::post('/repayment/emi/status/update',[RepaymentController::class,'emiStatusUpdate'])->middleware([ApiAuth::class]);
 
 #Splitwise
 Route::get('/splitwise/expense/summary',[SplitwiseController::class,'expenseSummary'])->middleware([ApiAuth::class]);
@@ -65,4 +66,3 @@ Route::get('/master/payment/status',[MasterController::class,'paymentStatus'])->
 Route::get('/master/credit-card/payment/status',[MasterController::class,'creditCardPaymentStatusList'])->middleware([ApiAuth::class]);
 Route::get('/master/emi/status',[MasterController::class,'emiStatus'])->middleware([ApiAuth::class]);
 Route::get('/master/emi/principle/status',[MasterController::class,'emiPrincipleStatus'])->middleware([ApiAuth::class]);
-Route::post('/master/emi/status/update',[RepaymentController::class,'emiStatusUpdate'])->middleware([ApiAuth::class]);

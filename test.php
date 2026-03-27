@@ -1,6 +1,4 @@
 <?php
 
-$test = [1,2,3,4,5,6];
 
-
-echo count($test);
+echo date('Y-m-d H:i:s');
