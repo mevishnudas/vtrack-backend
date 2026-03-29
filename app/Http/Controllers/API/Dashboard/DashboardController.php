@@ -36,7 +36,7 @@ class DashboardController extends Controller
 
         $sort_data = array();
         // This month last date
-        $sort_data["start_date"] = Carbon::now()->subMonth()->startOfMonth()->toDateString();
+        $sort_data["start_date"] = Carbon::now()->subMonthNoOverflow()->startOfMonth()->toDateString();
         // Last month first date
         $sort_data["end_date"] = Carbon::now()->endOfMonth()->addDay()->toDateString();
 
@@ -48,6 +48,9 @@ class DashboardController extends Controller
         $tomorrow = array("total"=>0,"received"=>0,"pending"=>0,"partially"=>0);
         $this_month = array("total"=>0,"received"=>0,"pending"=>0,"partially"=>0);
         $last_month = array("total"=>0,"received"=>0,"pending"=>0,"partially"=>0);
+
+        $carbon_now = Carbon::now();
+        $carbon_last_month = Carbon::now()->subMonthNoOverflow();
         foreach ($repaymentTodayAndTomorrow as $repaymentTodayAndTomorrow_row) {
 
             #Today
@@ -87,7 +90,7 @@ class DashboardController extends Controller
 
             #This Month
             $record_date = Carbon::parse($repaymentTodayAndTomorrow_row->payment_date);
-            if($record_date->isSameMonth(Carbon::now())){
+            if($record_date->isSameMonth($carbon_now)){
 
                 $this_month["total"] +=1;
                 switch ($repaymentTodayAndTomorrow_row->payment_status) {
@@ -105,7 +108,7 @@ class DashboardController extends Controller
             }
 
             #Last Month
-            if($record_date->isSameMonth(Carbon::now()->subMonth()))
+            if($record_date->isSameMonth($carbon_last_month))
             {
                 $last_month["total"] +=1;
                 switch ($repaymentTodayAndTomorrow_row->payment_status) {
@@ -120,6 +123,7 @@ class DashboardController extends Controller
                         break;
                 }
             }
+
         }
 
         #Save to Data
