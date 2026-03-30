@@ -161,7 +161,7 @@ class DashboardController extends Controller
 
         $sort_data = array();
         // This month last date
-        $sort_data["start_date"] = Carbon::now()->subMonth()->startOfMonth()->toDateString();
+        $sort_data["start_date"] = Carbon::now()->subMonthNoOverflow()->startOfMonth()->toDateString();
         // Last month first date
         $sort_data["end_date"] = Carbon::now()->endOfMonth()->toDateString();
 
@@ -180,17 +180,20 @@ class DashboardController extends Controller
             )
         );
 
+        $carbon_now = Carbon::now();
+        $carbon_last_month = Carbon::now()->subMonthNoOverflow();
+
         #Opened
         foreach ($response["opened"] as $opened) {
             #This Month
             $record_date = Carbon::parse($opened->distributed_date);
-            if($record_date->isSameMonth(Carbon::now())){
+            if($record_date->isSameMonth($carbon_now)){
                 $data["this_month"]["opened"] +=1;
             }
 
             #Last Month
             $record_date = Carbon::parse($opened->distributed_date);
-            if($record_date->isSameMonth(Carbon::now()->subMonth())){
+            if($record_date->isSameMonth($carbon_last_month)){
                 $data["last_month"]["opened"] +=1;
             }
         }
@@ -199,7 +202,7 @@ class DashboardController extends Controller
         foreach ($response["closed"] as $closed) {
             #This Month
             $record_date = Carbon::parse($closed->status_change_date);
-            if($record_date->isSameMonth(Carbon::now())){
+            if($record_date->isSameMonth($carbon_now)){
 
                 switch ($closed->emi_status) {
                     case 'CLOSED':
@@ -218,7 +221,7 @@ class DashboardController extends Controller
 
             #Last Month
             $record_date = Carbon::parse($closed->status_change_date);
-            if($record_date->isSameMonth(Carbon::now()->subMonth())){
+            if($record_date->isSameMonth($carbon_last_month)){
 
                 switch ($closed->emi_status) {
                     case 'CLOSED':
