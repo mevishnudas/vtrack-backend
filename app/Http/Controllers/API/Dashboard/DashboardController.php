@@ -51,6 +51,7 @@ class DashboardController extends Controller
 
         $carbon_now = Carbon::now();
         $carbon_last_month = Carbon::now()->subMonthNoOverflow();
+
         foreach ($repaymentTodayAndTomorrow as $repaymentTodayAndTomorrow_row) {
 
             #Today
