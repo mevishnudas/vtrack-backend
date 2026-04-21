@@ -15,7 +15,7 @@ class CreditCard extends Model
                         "bank.id",
                         "bank.name",
                         "bank.variant_name",
-                        "bank.last_digit",
+                        "bank.last_digit"
                     )
                     ->where("bank.bank_type","CREDIT_CARD")
                     ->where("bank.status",1)
@@ -62,7 +62,8 @@ class CreditCard extends Model
                         "bank.id",
                         "bank.name",
                         "bank.variant_name",
-                        "bank.last_digit"
+                        "bank.last_digit",
+                        "bank.statement_password"
                     )
                     ->where("id",$id)
                     ->where("status",1)

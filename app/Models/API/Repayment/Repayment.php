@@ -60,6 +60,10 @@ class Repayment extends Model
                     if(!empty($sort_data["payee"])){
                         $query->where("repayment.payee_id",$sort_data["payee"]);
                     }
+                    //Filter by status
+                    if(!empty($sort_data["payment_status"])){
+                        $query->where("repayment.payment_status",$sort_data["payment_status"]);
+                    }
 
                     $query->orderBy("repayment.payment_date","asc");
 
@@ -102,6 +106,7 @@ class Repayment extends Model
                         ->join("bank",'bank.id', '=', 'repayment_emi.source')
                         ->where("repayment_emi.user_id",$userInfo['id'])
                         ->where("repayment_emi.emi_status",$sort_data['status'])
+
 
                         //Filter by user
                         ->when($sort_data["payee"],fn($q)=>$q->where("repayment_emi.payee",$sort_data["payee"]))

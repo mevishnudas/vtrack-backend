@@ -98,7 +98,8 @@ class RepaymentController extends Controller
         $validator = Validator::make($request->all(), [
             "year"=>'required|numeric|in:2023,2024,2025,2026',
             "month"=>'required|numeric|in:1,2,3,4,5,6,7,8,9,10,11,12',
-            "payee"=>'sometimes|nullable|exclude_if:payee,0|integer|exists:user,id'
+            "payee"=>'sometimes|nullable|exclude_if:payee,0|integer|exists:user,id',
+            "payment_status"=>'present|nullable|exclude_if:payment_status,0|string|in:PENDING,RECEIVED,PARTIALLY_PAID'
         ]);
         if ($validator->fails()) {
             return response(["status"=>401,"msg"=>"Invalid Parameters","data"=>$validator->errors()],401);
@@ -114,6 +115,7 @@ class RepaymentController extends Controller
             $sort_data["start_date"] = $startDate;
             $sort_data["end_date"] = $endDate;
             $sort_data["payee"] = $request->payee;
+            $sort_data["payment_status"] = $request->payment_status;
             $repaymentList = Repayment::list($sort_data);
 
             //User Info
