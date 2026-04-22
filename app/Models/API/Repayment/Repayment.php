@@ -203,5 +203,45 @@ class Repayment extends Model
         return $response;
     }
 
+    public static function repaymentEMIOpenList(){
+        $response = DB::table("repayment_emi")
+                    ->join("bank","bank.id","=","repayment_emi.source")
+                    ->select(
+                        "repayment_emi.id",
+                        "repayment_emi.emi",
+                        "repayment_emi.duration",
+                        "repayment_emi.paid",
+                        "repayment_emi.source"
+                    )
+                    ->where("repayment_emi.emi_status","OPEN")
+                    ->where("bank.bank_type","BANK")
+                    ->get();
+        return $response;
+    }
+
+    public static function saveAccountSummary($insert_data,$current_date){
+        //Delete
+        $response = DB::table("account_summary")->where("sync_date",$current_date)->delete();
+
+        //Insert
+        $response = DB::table("account_summary")->insert($insert_data);
+        return $response;
+    }
+
+    public static function savedAccountSummary($sync_date){
+        $response = DB::table("account_summary")
+                    ->join("bank","bank.id","=","account_summary.bank_id")
+                    ->select(
+                        "bank.id",
+                        "bank.name",
+                        "account_summary.balance"
+                    )
+                    ->where("account_summary.sync_date",$sync_date)
+                     ->where("account_summary.balance","!=",0)
+                    ->orderBy("account_summary.id","ASC")
+                    ->get();
+        return $response;
+    }
+
 
 }

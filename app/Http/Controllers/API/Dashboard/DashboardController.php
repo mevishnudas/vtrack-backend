@@ -17,6 +17,8 @@ class DashboardController extends Controller
         $data["credit_summary"] = self::creditCardSummary();
         $data["repayment_summary"] = self::repaymentSummary();
         $data["emi_summary"] = self::emiSummary();
+        $data["account_summary"] = self::accountSummary();
+
         return response(["msg"=>"Success","data"=>$data],200);
     }
 
@@ -246,8 +248,18 @@ class DashboardController extends Controller
     }
 
     public function accountSummary(){
-        $sourceBankList = Master::sourceBankList();
-        $repaymentPendingList = Repayment::repaymentPendingList();
+
+        $sync_date = date('Y-m-d');
+        if (now()->lt(now()->copy()->setTime(6, 0))) {
+            // current time is less than 06:00 AM
+            $sync_date = date('Y-m-d',strtotime('-1 Day'));
+        }
+        $summary = Repayment::savedAccountSummary($sync_date);
+        $summaryList = array(
+            "last_sync"=>$sync_date,
+            "accounts"=>$summary
+        );
+        return $summaryList;
     }
 
 }

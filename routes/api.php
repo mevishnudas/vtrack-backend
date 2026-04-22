@@ -11,6 +11,7 @@ use App\Http\Controllers\API\Master\MasterController;
 use App\Http\Controllers\API\User\UserController;
 use App\Http\Controllers\API\Splitwise\SplitwiseController;
 use App\Http\Controllers\API\CreditCard\CreditCardController;
+use App\Http\Controllers\API\Cron\CronController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
@@ -66,3 +67,5 @@ Route::get('/master/payment/status',[MasterController::class,'paymentStatus'])->
 Route::get('/master/credit-card/payment/status',[MasterController::class,'creditCardPaymentStatusList'])->middleware([ApiAuth::class]);
 Route::get('/master/emi/status',[MasterController::class,'emiStatus'])->middleware([ApiAuth::class]);
 Route::get('/master/emi/principle/status',[MasterController::class,'emiPrincipleStatus'])->middleware([ApiAuth::class]);
+
+Route::get('/cron/run',[CronController::class,'run']);

@@ -9,6 +9,7 @@ use App\Models\API\Repayment\Repayment;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Database\Query\Builder;
+use App\Models\API\Master\Master;
 
 class RepaymentController extends Controller
 {
@@ -352,6 +353,55 @@ class RepaymentController extends Controller
             return response(["status"=>200,"msg"=>"Success"],200);
         }
 
+    }
+
+
+    public static function accountSummary(){
+
+        $accountSummary = array();
+        //$total_amount = 0;
+        $sourceBankList = Master::sourceBankList();
+
+        foreach ($sourceBankList as $sourceBankList_row) {
+            $accountSummary["B".$sourceBankList_row->id] = array(
+                "id"=>$sourceBankList_row->id,
+                "name"=>$sourceBankList_row->name,
+                "balance"=>0
+            );
+        }
+
+        // #Repayments
+        $repaymentPendingList = Repayment::repaymentPendingList();
+        foreach ($repaymentPendingList as $repaymentPendingList_row) {
+            $accountSummary["B".$repaymentPendingList_row->source]["balance"] +=$repaymentPendingList_row->amount;
+            //$total_amount+=$repaymentPendingList_row->amount;
+        }
+
+        #EMI Payments
+        $repaymentEMIOpenList = Repayment::repaymentEMIOpenList();
+        foreach ($repaymentEMIOpenList as $repaymentEMIOpenList_row) {
+
+            //Calculating EMI balance amount
+            $emi_amount = $repaymentEMIOpenList_row->emi;
+            $balance_duration = $repaymentEMIOpenList_row->duration-$repaymentEMIOpenList_row->paid;
+            $balance_amount = $emi_amount*$balance_duration;
+
+            $accountSummary["B".$repaymentEMIOpenList_row->source]["balance"] += $balance_amount;
+            //$total_amount+=$balance_amount;
+        }
+
+        //Save to Account Summary
+        $current_date = date('Y-m-d');
+        $insert_data = array();
+        foreach ($accountSummary as $accountSummary_row) {
+            $insert_data[] = array(
+                "bank_id"=>$accountSummary_row["id"],
+                "balance"=>$accountSummary_row["balance"],
+                "sync_date"=>$current_date
+            );
+        }
+        Repayment::saveAccountSummary($insert_data,$current_date);
+        return true;
     }
 
 }
