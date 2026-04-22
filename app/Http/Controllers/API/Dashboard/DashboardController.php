@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\API\CreditCard\CreditCard;
 use App\Http\Controllers\API\CreditCard\CreditCardController;
+use App\Models\API\Master\Master;
 use App\Models\API\Repayment\Repayment;
 
 class DashboardController extends Controller
@@ -242,6 +243,11 @@ class DashboardController extends Controller
 
         return $data;
 
+    }
+
+    public function accountSummary(){
+        $sourceBankList = Master::sourceBankList();
+        $repaymentPendingList = Repayment::repaymentPendingList();
     }
 
 }

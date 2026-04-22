@@ -32,4 +32,16 @@ class Master extends Model
     //                 ->get();
     //     return $response;
     // }
+
+    public static function sourceBankList(){
+        $response = DB::table("bank")
+                    ->select(
+                        "id",
+                        "name"
+                    )
+                    ->where("bank_type","BANK")
+                    ->where("status",1)
+                    ->get();
+        return $response;
+    }
 }

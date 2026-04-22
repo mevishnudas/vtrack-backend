@@ -190,4 +190,18 @@ class Repayment extends Model
         return $data;
     }
 
+
+    public static function repaymentPendingList(){
+        $response = DB::table("repayment")
+                    ->select(
+                        "id",
+                        "amount",
+                        "source"
+                    )
+                    ->where("payment_status","PENDING")
+                    ->get();
+        return $response;
+    }
+
+
 }
