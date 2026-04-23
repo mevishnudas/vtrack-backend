@@ -11,7 +11,7 @@ class CronController extends Controller
     public function run(){
 
         //Run Account Summary at 06:00 AM
-        if (now()->format('H:i') === '05:59') {
+        if (now()->format('H:i') === '06:00') {
             RepaymentController::accountSummary();
         }
 
