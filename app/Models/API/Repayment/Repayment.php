@@ -230,16 +230,22 @@ class Repayment extends Model
         return $response;
     }
 
-    public static function savedAccountSummary($sync_date){
+    public static function savedAccountSummary($sync_date,$last_month_date){
         $response = DB::table("account_summary")
                     ->join("bank","bank.id","=","account_summary.bank_id")
                     ->select(
                         "bank.id",
                         "bank.name",
-                        "account_summary.balance"
+                        "account_summary.balance",
+                        "account_summary.sync_date",
+                        "account_summary.date"
                     )
-                    ->where("account_summary.sync_date",$sync_date)
-                     ->where("account_summary.balance","!=",0)
+                    ->where(function ($query) use ($sync_date, $last_month_date) {
+                        $query->where("account_summary.sync_date", $sync_date)
+                              ->orWhere("account_summary.sync_date", $last_month_date);
+                    })
+                    //->where("account_summary.sync_date",$sync_date)
+                    ->where("account_summary.balance","!=",0)
                     ->orderBy("account_summary.id","ASC")
                     ->get();
         return $response;

@@ -254,10 +254,45 @@ class DashboardController extends Controller
             // current time is less than 06:00 AM
             $sync_date = date('Y-m-d',strtotime('-1 Day'));
         }
-        $summary = Repayment::savedAccountSummary($sync_date);
+
+        //Last Month
+        $last_month_date = date('Y-m-15',strtotime('-1 Month'));
+        $last_month_date = "2026-04-23"; //remove after may 15
+        $summary = Repayment::savedAccountSummary($sync_date,$last_month_date);
+
+        $accounts = array();
+        foreach($summary as $summary_row){
+
+            $last_month = true;
+            if($summary_row->sync_date == $sync_date){
+                $last_month = false;
+            }
+
+            if(empty(@$accounts["B".$summary_row->id])){
+                //New
+                $accounts["B".$summary_row->id] = array(
+                    "id"=>$summary_row->id,
+                    "name"=>$summary_row->name,
+                    "balance"=>$last_month?0:$summary_row->balance,
+                    "last_month_balance"=>$last_month?$summary_row->balance:0,
+                );
+
+            }
+            else{
+                //Already Exist
+                if($last_month){$accounts["B".$summary_row->id]["last_month_balance"] = $summary_row->balance;}
+                else
+                { $accounts["B".$summary_row->id]["balance"] = $summary_row->balance;}
+            }
+
+        }
+
+        $index = count($summary)-1;
+        $last_sync = empty(@$summary[$index]->date)?Null:@$summary[$index]->date;
+
         $summaryList = array(
-            "last_sync"=>$sync_date,
-            "accounts"=>$summary
+            "last_sync"=>$last_sync,
+            "accounts"=>array_values($accounts)
         );
         return $summaryList;
     }
