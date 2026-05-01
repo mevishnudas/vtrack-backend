@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\API\CreditCard\CreditCard;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Carbon\Carbon;
 
 class CreditCardController extends Controller
 {
@@ -40,6 +41,33 @@ class CreditCardController extends Controller
         }
 
         $data = collect($data)->sortBy("payment_date")->values();
+        return $data;
+    }
+
+    public static function creditCardBillSummary(){
+
+        $data = array();
+        $data["total_cards"] = CreditCard::totalCreditCardCount();
+        $latest_bill = CreditCard::getLatestPaymentDate();
+
+        $current_month_date = !empty(@$latest_bill->payment_date)?date('Y-m-d',strtotime(@$latest_bill->payment_date)):date('Y-m-d');
+        $prev_month_date = !empty(@$latest_bill->payment_date)?date('Y-m-d',strtotime(@$latest_bill->payment_date.' -1 Month')):date('Y-m-d',strtotime('-1 Month'));
+
+        #Current Month
+        $current_date = Carbon::parse($current_month_date);
+        $sort_data = array();
+        $sort_data["start_date"] = $current_date->startOfMonth()->toDateString();
+        $sort_data["end_date"]   = $current_date->endOfMonth()->toDateString();
+        $data["current_bill"] = CreditCard::creditCardPaymentHistoryDateWiseSum($sort_data);
+        $data["total_amount_due"] = CreditCard::creditCardPaymentHistoryDateWiseDueAmount($sort_data);
+
+        #Last Month
+        $last_month_date = Carbon::parse($prev_month_date);
+        $sort_data = array();
+        $sort_data["start_date"] = $last_month_date->startOfMonth()->toDateString();
+        $sort_data["end_date"]   = $last_month_date->endOfMonth()->toDateString();
+        $data["prev_month_bill"] = CreditCard::creditCardPaymentHistoryDateWiseSum($sort_data);
+
         return $data;
     }
 

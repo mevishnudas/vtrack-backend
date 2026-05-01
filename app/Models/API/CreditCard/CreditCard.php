@@ -24,6 +24,19 @@ class CreditCard extends Model
         return $response;
     }
 
+    public static function totalCreditCardCount(){
+
+        $userInfo = app('userData');
+        $response = DB::table("bank")
+                    //->select("bank.id")
+                    ->where("bank.bank_type","CREDIT_CARD")
+                    ->where("bank.status",1)
+                    ->where("bank.user_id",$userInfo['id'])
+                    ->count();
+
+        return $response;
+    }
+
     // public static function creditCardCount(){
 
     //     $userInfo = app('userData');
@@ -44,6 +57,7 @@ class CreditCard extends Model
     public static function creditCardPaymentHistoryLatest($ids){
 
         $latestRecords = DB::table('credit_card_payment_history')
+                        ->whereIn('credit_card_id', $ids)
                         ->whereIn('id', function($query) {
                             $query->selectRaw('MAX(id)')
                                 ->from('credit_card_payment_history')
@@ -52,6 +66,40 @@ class CreditCard extends Model
                         ->get();
         return $latestRecords;
     }
+
+    public static function creditCardPaymentHistoryDateWiseDueAmount($sort_data){
+        $userInfo = app('userData');
+        $total_amount = DB::table('credit_card_payment_history')
+                        ->join("bank","bank.id","=","credit_card_payment_history.credit_card_id")
+                        //->whereIn('credit_card_id', $ids)
+                        ->where("bank.user_id",$userInfo["id"])
+                        ->where("credit_card_payment_history.payment_status","PENDING")
+                        ->whereBetween('payment_date', [$sort_data["start_date"], $sort_data["end_date"]])
+                        ->sum('amount');
+        return $total_amount;
+    }
+
+    public static function creditCardPaymentHistoryDateWiseSum($sort_data){
+        $userInfo = app('userData');
+        $total_amount = DB::table('credit_card_payment_history')
+                        ->join("bank","bank.id","=","credit_card_payment_history.credit_card_id")
+                        //->whereIn('credit_card_id', $ids)
+                        ->where("bank.user_id",$userInfo["id"])
+                        ->whereBetween('payment_date', [$sort_data["start_date"], $sort_data["end_date"]])
+                        ->sum('amount');
+        return $total_amount;
+    }
+
+    public static function getLatestPaymentDate(){
+        $userInfo = app('userData');
+        $latestPaymentRecord = DB::table('credit_card_payment_history')
+                        ->join("bank","bank.id","=","credit_card_payment_history.credit_card_id")
+                        ->where("bank.user_id",$userInfo['id'])
+                        ->orderby("credit_card_payment_history.payment_date","DESC")
+                        ->first();
+        return $latestPaymentRecord;
+    }
+
 
     public static function creditCardInfo($id){
 

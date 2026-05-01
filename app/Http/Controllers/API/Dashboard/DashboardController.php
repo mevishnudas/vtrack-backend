@@ -23,16 +23,8 @@ class DashboardController extends Controller
     }
 
     public function creditCardSummary(){
-        $data = array();
-        $creditCardPaymentSummary = CreditCardController::creditCardPaymentSummary();
-        $total = collect($creditCardPaymentSummary)->where("payment_status","PENDING")->sum("amount");
-
-        $data = array(
-            "total_amount_due"=>$total,
-            "total_cards"=>count($creditCardPaymentSummary)
-        );
-
-        return $data;
+        $creditCardPaymentSummary = CreditCardController::creditCardBillSummary();
+        return $creditCardPaymentSummary;
     }
 
     public function repaymentSummary(){

@@ -169,28 +169,34 @@ class Repayment extends Model
     }
 
     public static function repaymentByDate($sort_data){
+        $userInfo = app('userData');
         $response = DB::table("repayment")
                         ->select("id","payment_status","payment_date")
                         ->whereBetween("payment_date",[$sort_data["start_date"],$sort_data["end_date"]])
+                        ->where("user_id",$userInfo['id'])
                         ->get();
         return $response;
     }
 
     public static function repaymentEMIByDate($sort_data){
+        $userInfo = app('userData');
         $data = array();
         $data["opened"] = DB::table("repayment_emi")
                         ->select("id","distributed_date")
                         ->whereBetween("distributed_date",[$sort_data["start_date"],$sort_data["end_date"]])
+                        ->where("user_id",$userInfo['id'])
                         ->get();
 
         $data["closed"] = DB::table("repayment_emi")
                 ->select("id","emi_status","status_change_date")
                 ->whereBetween("status_change_date",[$sort_data["start_date"],$sort_data["end_date"]])
+                ->where("user_id",$userInfo['id'])
                 ->get();
         return $data;
     }
 
 
+    #Only for Das
     public static function repaymentPendingList(){
         $response = DB::table("repayment")
                     ->join("bank","bank.id","=","repayment.source")
@@ -201,10 +207,12 @@ class Repayment extends Model
                     )
                     ->where("bank.bank_type","BANK")
                     ->where("repayment.payment_status","PENDING")
+                    ->where("repayment.user_id",1)
                     ->get();
         return $response;
     }
 
+    #Only for Das
     public static function repaymentEMIOpenList(){
         $response = DB::table("repayment_emi")
                     ->join("bank","bank.id","=","repayment_emi.source")
@@ -217,6 +225,7 @@ class Repayment extends Model
                     )
                     ->where("repayment_emi.emi_status","OPEN")
                     ->where("bank.bank_type","BANK")
+                    ->where("repayment_emi.user_id",1)
                     ->get();
         return $response;
     }

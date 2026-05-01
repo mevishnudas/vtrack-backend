@@ -332,8 +332,13 @@ class RepaymentController extends Controller
     }
 
     public function emiStatusUpdate(Request $request){
+         $userInfo = app('userData');
          $validator = Validator::make($request->all(), [
-            "id"=>'required|numeric|exists:repayment_emi,id',
+            //"id"=>'required|numeric|exists:repayment_emi,id',
+            "id" => ['required',
+                Rule::exists('repayment_emi','id')->where(function ($query) use ($userInfo) {
+                $query->where('user_id', $userInfo["id"]);
+            })],
             "paid"=>'required|numeric',
             "status"=>'required|string|in:OPEN,CLOSED,PRE_CLOSED',
             "remarks"=>'present|nullable'
@@ -355,7 +360,7 @@ class RepaymentController extends Controller
 
     }
 
-
+    #Only for Das
     public static function accountSummary(){
 
         $accountSummary = array();
@@ -397,7 +402,8 @@ class RepaymentController extends Controller
             $insert_data[] = array(
                 "bank_id"=>$accountSummary_row["id"],
                 "balance"=>$accountSummary_row["balance"],
-                "sync_date"=>$current_date
+                "sync_date"=>$current_date,
+                "user_id"=>1
             );
         }
         Repayment::saveAccountSummary($insert_data,$current_date);

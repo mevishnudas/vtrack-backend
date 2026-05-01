@@ -69,3 +69,4 @@ Route::get('/master/emi/status',[MasterController::class,'emiStatus'])->middlewa
 Route::get('/master/emi/principle/status',[MasterController::class,'emiPrincipleStatus'])->middleware([ApiAuth::class]);
 
 Route::get('/cron/run',[CronController::class,'run']);
+//Route::get('/database/backup/download',[CronController::class,'databaseBackup']);

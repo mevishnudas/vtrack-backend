@@ -41,6 +41,7 @@ class Master extends Model
                     )
                     ->where("bank_type","BANK")
                     ->where("status",1)
+                    ->where("user_id",1)
                     ->get();
         return $response;
     }
