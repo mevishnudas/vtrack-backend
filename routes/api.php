@@ -12,7 +12,7 @@ use App\Http\Controllers\API\User\UserController;
 use App\Http\Controllers\API\Splitwise\SplitwiseController;
 use App\Http\Controllers\API\CreditCard\CreditCardController;
 use App\Http\Controllers\API\Cron\CronController;
-
+use App\Http\Controllers\API\Expense\ExpenseController;
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');
@@ -53,6 +53,12 @@ Route::post('/credit-card/detail',[CreditCardController::class,'details'])->midd
 Route::post('/credit-card/bill/add',[CreditCardController::class,'billAdd'])->middleware([ApiAuth::class]);
 Route::post('/credit-card/bill/update',[CreditCardController::class,'billUpdate'])->middleware([ApiAuth::class]);
 Route::post('/credit-card/bill/delete',[CreditCardController::class,'billDelete'])->middleware([ApiAuth::class]);
+
+#Expense
+Route::get('/expense/category/list',[ExpenseController::class,'categoryList'])->middleware([ApiAuth::class]);
+Route::post('/expense/category/add',[ExpenseController::class,'categoryAdd'])->middleware([ApiAuth::class]);
+Route::post('/expense/add',[ExpenseController::class,'expenseAdd'])->middleware([ApiAuth::class]);
+
 
 #Users
 Route::get('/users/list',[UserController::class,'list'])->middleware([ApiAuth::class]);
