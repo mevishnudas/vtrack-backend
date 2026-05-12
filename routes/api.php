@@ -58,6 +58,10 @@ Route::post('/credit-card/bill/delete',[CreditCardController::class,'billDelete'
 Route::get('/expense/category/list',[ExpenseController::class,'categoryList'])->middleware([ApiAuth::class]);
 Route::post('/expense/category/add',[ExpenseController::class,'categoryAdd'])->middleware([ApiAuth::class]);
 Route::post('/expense/add',[ExpenseController::class,'expenseAdd'])->middleware([ApiAuth::class]);
+Route::post('/expense/update',[ExpenseController::class,'expenseUpdate'])->middleware([ApiAuth::class]);
+Route::post('/expense/delete',[ExpenseController::class,'expenseDelete'])->middleware([ApiAuth::class]);
+Route::post('/expense/list',[ExpenseController::class,'expenseList'])->middleware([ApiAuth::class]);
+Route::get('/expense/overview',[ExpenseController::class,'overview'])->middleware([ApiAuth::class]);
 
 
 #Users
