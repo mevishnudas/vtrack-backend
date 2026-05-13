@@ -445,7 +445,7 @@ class RepaymentController extends Controller
         }
 
         $data = collect($data)->sortBy("emi_payment_due_date")->values();
-
+        //$data=array();
         return response(["msg"=>"Success","data"=>$data],200);
     }
 
