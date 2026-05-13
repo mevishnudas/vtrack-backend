@@ -5,6 +5,7 @@ namespace App\Models\API\Repayment;
 use Illuminate\Database\Eloquent\Model;
 use DB;
 use Symfony\Component\HttpFoundation\Request;
+use Carbon\Carbon;
 
 class Repayment extends Model
 {
@@ -240,6 +241,8 @@ class Repayment extends Model
     }
 
     public static function savedAccountSummary($sync_date,$last_month_date){
+
+        $userInfo = app('userData');
         $response = DB::table("account_summary")
                     ->join("bank","bank.id","=","account_summary.bank_id")
                     ->select(
@@ -255,10 +258,49 @@ class Repayment extends Model
                     })
                     //->where("account_summary.sync_date",$sync_date)
                     ->where("account_summary.balance","!=",0)
+                    ->where("account_summary.user_id",$userInfo["id"])
                     ->orderBy("account_summary.id","ASC")
                     ->get();
         return $response;
     }
 
+
+    public static function getUpcomingEMI($sort_data){
+
+        $userInfo = app('userData');
+        $response = DB::table("repayment_emi as re")
+                    ->select(
+                        "re.id",
+                        "user.name",
+                        "re.amount",
+                        "re.payment_date as emi_start_date",
+                        "re.duration",
+                        "re.paid",
+
+                        "rs.payment_status as emi_payment_status",
+                        "rs.principle as emi_current_principle",
+                        "rs.amount as emi_amount",
+                        "rs.payment_date as emi_payment_due_date",
+                        "rs.remarks as emi_remarks",
+
+                        "bank.id as bank_id",
+                        "bank.name as bank_name"
+                    )
+                    ->join("user","user.id","=","re.payee")
+                    ->join("bank","bank.id","=","re.source")
+
+                    ->leftJoin('repayment_emi_schedule as rs', function ($join) use ($sort_data) {
+                        $join->on('rs.emi_id', '=', 're.id')
+                            ->whereBetween('rs.payment_date', [
+                                $sort_data["start_date"],
+                                $sort_data["end_date"]
+                            ]);
+                    })
+
+                    ->where("re.user_id",$userInfo["id"])
+                    ->where("re.emi_status","OPEN")
+                    ->get();
+        return $response;
+    }
 
 }

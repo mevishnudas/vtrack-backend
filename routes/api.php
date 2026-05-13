@@ -35,6 +35,7 @@ Route::post('/repayment/emi/schedule/add',[RepaymentController::class,'emiSchedu
 Route::post('/repayment/emi/schedule/update',[RepaymentController::class,'emiScheduleUpdate'])->middleware([ApiAuth::class]);
 Route::post('/repayment/emi/schedule/list',[RepaymentController::class,'emiScheduleList'])->middleware([ApiAuth::class]);
 Route::post('/repayment/emi/status/update',[RepaymentController::class,'emiStatusUpdate'])->middleware([ApiAuth::class]);
+Route::get('/repayment/emi/upcoming',[RepaymentController::class,'emiUpcoming'])->middleware([ApiAuth::class]);
 
 #Splitwise
 Route::get('/splitwise/expense/summary',[SplitwiseController::class,'expenseSummary'])->middleware([ApiAuth::class]);

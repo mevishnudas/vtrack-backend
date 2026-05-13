@@ -410,4 +410,43 @@ class RepaymentController extends Controller
         return true;
     }
 
+    public function emiUpcoming(Request $request){
+
+        $sort_data = array();
+        $sort_data["start_date"] = Carbon::now()->startOfMonth()->format('Y-m-d');
+        $sort_data["end_date"] = Carbon::now()->endOfMonth()->format('Y-m-d');
+
+        $upcomingEMI = Repayment::getUpcomingEMI($sort_data);
+
+        $data = array();
+        foreach ($upcomingEMI as $upcomingEMI_row) {
+
+            $temp = (array)$upcomingEMI_row;
+
+            if($temp["emi_payment_status"]==null){
+                $temp["emi_payment_status"]="NOT_GENERATED";
+            }
+
+            if($temp["emi_current_principle"]==null){
+                $temp["emi_current_principle"]=$temp["paid"]+1;
+            }
+
+            if($temp["emi_payment_due_date"]==null){
+
+                if(date('m',strtotime($upcomingEMI_row->emi_start_date))!=date("m")){
+                    continue;
+                }
+
+                $current_date = date('Y-m');
+                $temp["emi_payment_due_date"] = $current_date.date('-d',strtotime($upcomingEMI_row->emi_start_date));
+            }
+
+            $data[] = $temp;
+        }
+
+        $data = collect($data)->sortBy("emi_payment_due_date")->values();
+
+        return response(["msg"=>"Success","data"=>$data],200);
+    }
+
 }
