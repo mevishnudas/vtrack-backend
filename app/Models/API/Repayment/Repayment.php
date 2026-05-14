@@ -265,7 +265,7 @@ class Repayment extends Model
     }
 
 
-    public static function getUpcomingEMI($sort_data){
+    public static function getUpcomingEMI2($sort_data){
 
         $userInfo = app('userData');
         $response = DB::table("repayment_emi as re")
@@ -300,6 +300,99 @@ class Repayment extends Model
                     ->where("re.user_id",$userInfo["id"])
                     ->where("re.emi_status","OPEN")
                     ->get();
+        return $response;
+    }
+
+    public static function getUpcomingEMI(){
+
+        $userInfo = app('userData');
+        $response = DB::table("repayment_emi as re")
+        ->select(
+            "re.id",
+            "user.name",
+            "re.amount",
+            "re.payment_date as emi_start_date",
+            "re.duration",
+            "re.paid",
+
+            "rs.payment_status as emi_payment_status",
+            "rs.principle as emi_current_principle",
+            "rs.amount as emi_amount",
+            "rs.payment_date as emi_payment_due_date",
+            "rs.remarks as emi_remarks",
+
+            "bank.id as bank_id",
+            "bank.name as bank_name"
+        )
+
+        ->join("user", "user.id", "=", "re.payee")
+        ->join("bank", "bank.id", "=", "re.source")
+
+        ->leftJoin("repayment_emi_schedule as rs", function ($join) {
+            $join->on('rs.emi_id', '=', 're.id')
+                ->whereRaw('rs.id = (
+                    SELECT MAX(id)
+                    FROM repayment_emi_schedule
+                    WHERE emi_id = re.id
+                )');
+        })
+
+        ->where("re.user_id", $userInfo["id"])
+        ->where("re.emi_status", "OPEN")
+
+        ->orderBy("re.id", "DESC")
+
+        ->get();
+
+        return $response;
+    }
+
+    public static function getAllOpenEMI(){
+        $userInfo = app('userData');
+
+        $response = DB::table("repayment_emi as re")
+        ->select(
+            "re.id",
+            "user.name",
+            "re.amount",
+            "re.payment_date as emi_start_date",
+            "re.duration",
+            "re.paid",
+
+            "bank.id as bank_id",
+            "bank.name as bank_name"
+        )
+
+        ->join("user", "user.id", "=", "re.payee")
+        ->join("bank", "bank.id", "=", "re.source")
+
+        ->where("re.user_id", $userInfo["id"])
+        ->where("re.emi_status", "OPEN")
+        ->orderBy("re.id", "DESC")
+        ->get();
+
+        return $response;
+    }
+
+    public static function getAllOpenEMISchedule($emi_id){
+
+        $latestIds = DB::table("repayment_emi_schedule")
+                    ->selectRaw("MAX(id) as id")
+                    ->whereIn("emi_id", $emi_id)
+                    ->groupBy("emi_id");
+
+        $response = DB::table("repayment_emi_schedule as rs")
+        ->select(
+            "rs.emi_id",
+            "rs.payment_status as emi_payment_status",
+            "rs.principle as emi_current_principle",
+            "rs.amount as emi_amount",
+            "rs.payment_date as emi_payment_due_date",
+            "rs.remarks as emi_remarks"
+        )
+        ->whereIn("rs.id", $latestIds)
+        ->orderBy("rs.id", "DESC")
+        ->get();
         return $response;
     }
 
