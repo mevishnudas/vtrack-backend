@@ -410,7 +410,7 @@ class RepaymentController extends Controller
         return true;
     }
 
-    public function emiUpcoming(Request $request){
+    public function emiUpcoming2(Request $request){
 
         $sort_data = array();
         $sort_data["start_date"] = Carbon::now()->startOfMonth()->format('Y-m-d');
@@ -446,6 +446,88 @@ class RepaymentController extends Controller
 
         $data = collect($data)->sortBy("emi_payment_due_date")->values();
         //$data=array();
+        return response(["msg"=>"Success","data"=>$data],200);
+    }
+
+    public function emiUpcoming(Request $request){
+
+        $validator = Validator::make($request->all(), [
+            "month"=>'required|numeric|in:1,2,3,4,5,6,7,8,9,10,11,12',
+            "year"=>'required|numeric|in:2023,2024,2025,2026',
+        ]);
+        if ($validator->fails()) {
+            return response(["status"=>401,"msg"=>"Invalid Parameters","data"=>$validator->errors()],401);
+        }
+
+        $selected_month = Carbon::create($request->year, $request->month, 1)->startOfMonth();
+
+        $upcomingOpenEMI = Repayment::getAllOpenEMI();
+        $emi_ids = collect($upcomingOpenEMI)->pluck("id");
+        $emiSchedule = Repayment::getAllOpenEMISchedule($emi_ids);
+
+        $emiScheduleIndexed = array(); //rearrange schedule with emi id
+        foreach ($emiSchedule as $emiSchedule_row) {
+            $emiScheduleIndexed["E".$emiSchedule_row->emi_id] = $emiSchedule_row;
+        }
+
+        $data = array();
+        foreach ($upcomingOpenEMI as $upcomingEMI_row) {
+
+            $schedule = (array)@$emiScheduleIndexed["E".$upcomingEMI_row->id];
+
+            //Current Date
+            $first_payment_date = Carbon::parse($upcomingEMI_row->emi_start_date);
+            $last_payment_date = Carbon::parse(@$schedule["emi_payment_due_date"]);
+
+            //Skip If First Payment Date Grater than current month
+            if ($first_payment_date->format('Y-m') > $selected_month->format('Y-m')) {
+                continue;
+            }
+
+            //EMI Status
+            $emi_payment_status = @$schedule["emi_payment_status"];
+            $emi_payment_due_date = @$schedule["emi_payment_due_date"];
+
+
+            //check last payment date is current month
+            if($emi_payment_due_date==null){
+                $emi_payment_status = "NOT_GENERATED";
+
+                //last payment date is null then this will be first emi
+                $emi_payment_due_date = $upcomingEMI_row->emi_start_date;
+
+            }else{
+                if ($last_payment_date->format('Y-m') < $selected_month->format('Y-m')) {
+                    $emi_payment_status = "NOT_GENERATED";
+
+                    $emi_payment_due_date = $last_payment_date->addMonth()->format("Y-m-d");
+                }
+            }
+
+            //Skip If not selected month
+            if(Carbon::parse($emi_payment_due_date)->format("Y-m")!=$selected_month->format('Y-m')){
+                continue;
+            }
+
+            $data[] = array(
+                "id"=>$upcomingEMI_row->id,
+                "name"=>$upcomingEMI_row->name,
+                "amount"=>$upcomingEMI_row->amount,
+                "emi_start_date"=>$upcomingEMI_row->emi_start_date,
+                "duration"=>$upcomingEMI_row->duration,
+                "paid"=>$upcomingEMI_row->paid,
+                "bank_id"=>$upcomingEMI_row->bank_id,
+                "bank_name"=>$upcomingEMI_row->bank_name,
+
+                "emi_payment_status"=>$emi_payment_status,
+                "emi_current_principle"=>@$schedule["emi_current_principle"],
+                "emi_amount"=>@$schedule["emi_amount"],
+                "emi_payment_due_date"=>$emi_payment_due_date,
+                "emi_remarks"=>@$schedule["emi_remarks"],
+            );
+        }
+
+        $data = collect($data)->sortBy("emi_payment_due_date")->values();
         return response(["msg"=>"Success","data"=>$data],200);
     }
 
