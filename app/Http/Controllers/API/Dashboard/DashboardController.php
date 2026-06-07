@@ -249,7 +249,7 @@ class DashboardController extends Controller
 
         //Last Month
         $last_month_date = date('Y-m-15',strtotime('-1 Month'));
-        $last_month_date = "2026-04-23"; //remove after may 15
+        // $last_month_date = "2026-04-23"; //remove after may 15
         $summary = Repayment::savedAccountSummary($sync_date,$last_month_date);
 
         $accounts = array();
