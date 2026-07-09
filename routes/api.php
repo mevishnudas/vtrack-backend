@@ -13,6 +13,8 @@ use App\Http\Controllers\API\Splitwise\SplitwiseController;
 use App\Http\Controllers\API\CreditCard\CreditCardController;
 use App\Http\Controllers\API\Cron\CronController;
 use App\Http\Controllers\API\Expense\ExpenseController;
+use App\Http\Controllers\API\Test\TestController;
+
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');
@@ -81,3 +83,6 @@ Route::get('/master/emi/principle/status',[MasterController::class,'emiPrinciple
 
 Route::get('/cron/run',[CronController::class,'run']);
 //Route::get('/database/backup/download',[CronController::class,'databaseBackup']);
+
+#Testing Only
+Route::get('/test',[TestController::class,'test']);
