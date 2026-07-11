@@ -65,6 +65,7 @@ Route::post('/expense/update',[ExpenseController::class,'expenseUpdate'])->middl
 Route::post('/expense/delete',[ExpenseController::class,'expenseDelete'])->middleware([ApiAuth::class]);
 Route::post('/expense/list',[ExpenseController::class,'expenseList'])->middleware([ApiAuth::class]);
 Route::get('/expense/overview',[ExpenseController::class,'overview'])->middleware([ApiAuth::class]);
+Route::post('/expense/summary',[ExpenseController::class,'periodSummary'])->middleware([ApiAuth::class]);
 
 
 #Users

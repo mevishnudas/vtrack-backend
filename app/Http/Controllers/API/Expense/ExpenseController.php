@@ -188,5 +188,33 @@ class ExpenseController extends Controller
 
     }
 
+    public function periodSummary(Request $request){
+
+         $validator = Validator::make($request->all(), [
+            "period"=>"required|in:this_year,last_month,this_month,today"
+        ]);
+
+        if ($validator->fails()) {
+            return response(["status"=>401,"msg"=>"Invalid Parameters","data"=>$validator->errors()],401);
+        }else{
+
+            $sort_data = array(
+                "start_date"=>"2026-07-01",
+                "end_date"=>"2026-07-31"
+            );
+            $summaryCategoryWise = Expense::summaryCategoryWise($sort_data);
+
+            $data = array();
+            foreach($summaryCategoryWise as $summaryCategoryWise_row) {
+                $data[] = array(
+                    "id"=>$summaryCategoryWise_row->id,
+                    "name"=>$summaryCategoryWise_row->name,
+                    "total_amount"=>round($summaryCategoryWise_row->total_amount,2)
+                );
+            }
+
+            return response(["msg"=>"Success","data"=>$data],200);
+        }
+    }
 
 }

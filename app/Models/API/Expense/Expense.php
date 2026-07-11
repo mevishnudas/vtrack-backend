@@ -91,5 +91,21 @@ class Expense extends Model
         return $response;
     }
 
+    public static function summaryCategoryWise($sort_data){
+
+        $response = DB::table('expense_category')
+            ->leftJoin('expense', 'expense_category.id', '=', 'expense.category_id')
+            ->whereBetween('expense.transaction_date', [$sort_data["start_date"], $sort_data["end_date"]])
+            ->select(
+                'expense_category.id',
+                'expense_category.name',
+                DB::raw('COALESCE(SUM(expense.amount), 0) as total_amount')
+            )
+            ->groupBy('expense_category.id', 'expense_category.name')
+            ->get();
+
+        return $response;
+    }
+
 
 }
