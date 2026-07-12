@@ -92,9 +92,11 @@ class Expense extends Model
     }
 
     public static function summaryCategoryWise($sort_data){
+        $userInfo = app('userData');
 
         $response = DB::table('expense_category')
             ->leftJoin('expense', 'expense_category.id', '=', 'expense.category_id')
+            ->where("expense.user_id",$userInfo["id"])
             ->whereBetween('expense.transaction_date', [$sort_data["start_date"], $sort_data["end_date"]])
             ->select(
                 'expense_category.id',

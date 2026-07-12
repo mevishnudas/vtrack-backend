@@ -198,10 +198,38 @@ class ExpenseController extends Controller
             return response(["status"=>401,"msg"=>"Invalid Parameters","data"=>$validator->errors()],401);
         }else{
 
+            #Today is default
             $sort_data = array(
-                "start_date"=>"2026-07-01",
-                "end_date"=>"2026-07-31"
+                "start_date"=>date("Y-m-d"),
+                "end_date"=>date("Y-m-d")
             );
+            switch ($request->period) {
+                case 'this_year':
+                    $sort_data = array(
+                        "start_date"=>date("Y-01-01"),
+                        "end_date"=>date("Y-m-d")
+                    );
+                    break;
+
+                case 'last_month':
+                    $sort_data = array(
+                        "start_date"=>date("Y-m-01", strtotime("-1 month")),
+                        "end_date"=>date("Y-m-t", strtotime("-1 month"))
+                    );
+                    break;
+
+                case 'this_month':
+                    $sort_data = array(
+                        "start_date"=>date("Y-m-01"),
+                        "end_date"=>date("Y-m-d")
+                    );
+                    break;
+
+                default:
+                    # code...
+                    break;
+            }
+
             $summaryCategoryWise = Expense::summaryCategoryWise($sort_data);
 
             $data = array();
