@@ -213,8 +213,8 @@ class ExpenseController extends Controller
 
                 case 'last_month':
                     $sort_data = array(
-                        "start_date"=>date("Y-m-01", strtotime("-1 month")),
-                        "end_date"=>date("Y-m-t", strtotime("-1 month"))
+                        "start_date"=>date("Y-m-d", strtotime("first day of last month")),
+                        "end_date"=>date("Y-m-d", strtotime("last day of last month"))
                     );
                     break;
 
