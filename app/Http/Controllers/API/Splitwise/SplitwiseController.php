@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\API\Splitwise\Splitwise;
 use Illuminate\Validation\Rule;
+use App\Models\API\Expense\Expense;
 
 class SplitwiseController extends Controller
 {
@@ -41,6 +42,7 @@ class SplitwiseController extends Controller
         $userInfo = app('userData');
         $amount = $request->amount;
         $split_by = count($request->friends);
+        $insert_expense = array();
 
         $ows_you = true;
         switch ($request->split_method) {
@@ -69,6 +71,15 @@ class SplitwiseController extends Controller
             default:
                 $split_by +=1;
                 $split_amount = round($amount/$split_by,2);
+
+                $insert_expense = array(
+                    "title"=>"Splitwise",
+                    "amount"=>$split_amount,
+                    "notes"=>$request->remarks,
+                    "category_id"=>34,
+                    "transaction_date"=>date("Y-m-d"),
+                    "user_id"=>$userInfo["id"]
+                );
                 break;
         }
 
@@ -92,7 +103,6 @@ class SplitwiseController extends Controller
             $transactions[] = array(
                 "from_user"=>$from_user,
                 "to_user"=>$to_user,
-
                 "amount"=>$split_amount
             );
 
@@ -100,9 +110,16 @@ class SplitwiseController extends Controller
 
         if(!empty($insert_data))
         {
-            $response = Splitwise::expenseAdd($insert_data);
+            Splitwise::expenseAdd($insert_data);
             self::modifyExpenseSummary($transactions);
+
+            //Add to expense
+            if(!empty($insert_expense)){
+                Expense::addExpense($insert_expense);
+            }
+
         }
+
         return response(["status"=>200,"msg"=>"Success"],200);
     }
 
