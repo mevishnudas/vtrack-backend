@@ -29,6 +29,7 @@ Route::get('/dashboard/summary',[DashboardController::class,'summary'])->middlew
 Route::post('/repayment/list',[RepaymentController::class,'list'])->middleware([ApiAuth::class]);
 Route::post('/repayment/add',[RepaymentController::class,'addNew'])->middleware([ApiAuth::class]);
 Route::post('/repayment/update',[RepaymentController::class,'update'])->middleware([ApiAuth::class]);
+Route::post('/repayment/user/summary',[RepaymentController::class,'userSummary'])->middleware([ApiAuth::class]);
 
 #EMI
 Route::post('/repayment/emi/add',[RepaymentController::class,'emiAdd'])->middleware([ApiAuth::class]);

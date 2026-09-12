@@ -269,30 +269,7 @@ class SplitwiseController extends Controller
 
             $data = array();
             $userInfo = app('userData');
-
-            $expenseFriendSummary = Splitwise::expenseFriendSummary($request->friend);
-            if(empty($expenseFriendSummary)){
-                $data["summary"] = array();
-                $data["transactions"] = array();
-                return response(["status"=>200,"msg"=>"Success","data"=>$data],200);
-            }
-
-
-            if($expenseFriendSummary->balance>0){
-                $ows_status = "OWS_YOU";
-            }elseif($expenseFriendSummary->balance<0){
-                $ows_status = "YOU_OWS";
-            }else{
-                $ows_status = "SETTLED_UP";
-            }
-
-            $data["summary"] = array(
-                "id"=>$expenseFriendSummary->id,
-                "name"=>$expenseFriendSummary->name,
-                "balance"=>abs($expenseFriendSummary->balance),
-                "ows_status"=>$ows_status
-            );
-
+            $data["summary"] = self::expenseFriendSummaryCalc($request->friend);
 
             $data["transactions"] = array();
             $expenseTransactionList = Splitwise::expenseTransactionList($request->friend);
@@ -325,6 +302,34 @@ class SplitwiseController extends Controller
         }
 
         //end func
+    }
+
+    public static function expenseFriendSummaryCalc($friend){
+
+        $expenseFriendSummary = Splitwise::expenseFriendSummary($friend);
+        if(empty($expenseFriendSummary)){
+            $data["summary"] = array();
+            $data["transactions"] = array();
+            return response(["status"=>200,"msg"=>"Success","data"=>$data],200);
+        }
+
+
+        if($expenseFriendSummary->balance>0){
+            $ows_status = "OWS_YOU";
+        }elseif($expenseFriendSummary->balance<0){
+            $ows_status = "YOU_OWS";
+        }else{
+            $ows_status = "SETTLED_UP";
+        }
+
+        $data = array(
+            "id"=>$expenseFriendSummary->id,
+            "name"=>$expenseFriendSummary->name,
+            "balance"=>abs($expenseFriendSummary->balance),
+            "ows_status"=>$ows_status
+        );
+
+        return $data;
     }
 
     public function expenseFriendTransactionUpdate(Request $request){

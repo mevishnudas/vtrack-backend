@@ -396,4 +396,37 @@ class Repayment extends Model
         return $response;
     }
 
+    public static function userRepaymentSummary($payee_id){
+        $data = array();
+        $data["total"] = DB::table("repayment")
+                            ->where("payee_id",$payee_id)
+                            ->where("payment_status","PENDING")
+                            ->where("status",1)
+                        ->count();
+
+        $data["total_amount"] = DB::table("repayment")
+                                    ->where("payee_id",$payee_id)
+                                    ->where("payment_status","PENDING")
+                                    ->where("status",1)
+                                ->sum("total");
+        return $data;
+    }
+
+    public static function userRepaymentEMISummary($payee_id){
+        $data = array();
+        $data["total"] = DB::table("repayment_emi")
+                            ->where("payee",$payee_id)
+                            ->where("emi_status","OPEN")
+                            ->where("status",1)
+                        ->count();
+
+        $data["active_emi"] = DB::table("repayment_emi")
+                                ->select("amount","duration","paid","emi")
+                                ->where("payee",$payee_id)
+                                ->where("emi_status","OPEN")
+                                ->where("status",1)
+                                ->get();
+        return $data;
+    }
+
 }

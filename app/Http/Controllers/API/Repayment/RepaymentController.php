@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Database\Query\Builder;
 use App\Models\API\Master\Master;
+use App\Http\Controllers\API\Splitwise\SplitwiseController;
 
 class RepaymentController extends Controller
 {
@@ -528,6 +529,53 @@ class RepaymentController extends Controller
         }
 
         $data = collect($data)->sortBy("emi_payment_due_date")->values();
+        return response(["msg"=>"Success","data"=>$data],200);
+    }
+
+
+    public function userSummary(Request $request){
+        $validator = Validator::make($request->all(), [
+            "id"=>'required|exists:user,id',
+        ]);
+        if ($validator->fails()) {
+            return response(["status"=>401,"msg"=>"Invalid Parameters","data"=>$validator->errors()],401);
+        }
+
+        $repayment = Repayment::userRepaymentSummary($request->id);
+        $emi = Repayment::userRepaymentEMISummary($request->id);
+
+        $emi_total_amount = 0;
+        foreach ($emi["active_emi"] as $emi_row) {
+            $balance_duration = $emi_row->duration - $emi_row->paid;
+            $emi_total_amount += $emi_row->emi*$balance_duration;
+        }
+
+        $splitWise = SplitwiseController::expenseFriendSummaryCalc($request->id);
+
+        $grand_total = 0;
+        $grand_total = $repayment["total_amount"]+$emi_total_amount;
+        if($splitWise["ows_status"]=="OWS_YOU"){
+            $grand_total += $splitWise["balance"];
+        }
+        if($splitWise["ows_status"]=="YOU_OWS"){
+            $grand_total -= $splitWise["balance"];
+        }
+
+        $data = array(
+            "repayment"=>array(
+                "total"=>$repayment["total"],
+                "total_amount"=>$repayment["total_amount"]
+            ),
+            "emi"=>array(
+                "total"=>$emi["total"],
+                "total_amount"=>$emi_total_amount
+            ),
+            "splitwise"=>array(
+                "total"=>$splitWise["balance"],
+                "ows_status"=>$splitWise["ows_status"]
+            ),
+            "grand_total"=>$grand_total
+        );
         return response(["msg"=>"Success","data"=>$data],200);
     }
 
