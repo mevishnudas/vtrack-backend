@@ -11,6 +11,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Database\Query\Builder;
 use App\Models\API\Master\Master;
 use App\Http\Controllers\API\Splitwise\SplitwiseController;
+use App\Models\API\User\User;
 
 class RepaymentController extends Controller
 {
@@ -579,4 +580,25 @@ class RepaymentController extends Controller
         return response(["msg"=>"Success","data"=>$data],200);
     }
 
+    public function overallSummary(Request $request){
+        $data = array();
+        $friends = User::friendsList();
+        $friends_ids = collect($friends)->pluck('id')->toArray();
+
+        $repayment = Repayment::friendsRepaymentSummary($friends_ids);
+        $emi = Repayment::friendsEMISummary($friends_ids);
+
+        $data["repayment"] = array(
+            "total"=>$repayment["summary"]->count,
+            "total_amount"=>$repayment["summary"]->total,
+            "user_overview"=>$repayment["repayment_list"]
+        );
+
+        $data["emi"] = array(
+            "total"=>$emi["summary"]->count,
+            "total_amount"=>$emi["summary"]->total,
+            "user_overview"=>$emi["emi_list"]
+        );
+        return response(["msg"=>"Success","data"=>$data],200);
+    }
 }

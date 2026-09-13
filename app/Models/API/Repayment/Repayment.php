@@ -429,4 +429,61 @@ class Repayment extends Model
         return $data;
     }
 
+    public static function friendsRepaymentSummary($friends_ids){
+        $data = array();
+        $data["summary"] = DB::table("repayment")
+                            ->whereIn("payee_id", $friends_ids)
+                            ->where("payment_status", "PENDING")
+                            ->where("status", 1)
+                            ->selectRaw("COUNT(*) as count, SUM(total) as total")
+                        ->first();
+
+        $data["repayment_list"] = DB::table("repayment")
+                                    ->join("user","user.id","=","repayment.payee_id")
+                                    ->select(
+                                        "user.id",
+                                        "user.name",
+                                        # "repayment.total",
+                                        DB::raw("SUM(repayment.total) as amount")
+                                    )
+                                    ->whereIn("repayment.payee_id",$friends_ids)
+                                    ->where("repayment.payment_status","PENDING")
+                                    ->where("repayment.status",1)
+                                    ->groupBy("user.id","user.name")
+                                    ->orderByDesc("amount")
+                                ->get();
+
+        return $data;
+    }
+
+    public static function friendsEMISummary($friends_ids){
+        $data = array();
+        $data["summary"] = DB::table("repayment_emi")
+                            ->whereIn("payee",$friends_ids)
+                            ->where("emi_status","OPEN")
+                            ->where("status",1)
+                            ->selectRaw("
+                                COUNT(*) as count,
+                                COALESCE(SUM((duration - paid) * emi), 0) as total
+                            ")
+                            ->first();
+
+        $data["emi_list"] = DB::table("repayment_emi")
+                                ->join("user","user.id","=","repayment_emi.payee")
+                                //->select("repayment_emi.amount","repayment_emi.duration","repayment_emi.paid","emi")
+                                ->select(
+                                    "user.id as id",
+                                    "user.name",
+                                    DB::raw("SUM((repayment_emi.duration - repayment_emi.paid) * repayment_emi.emi) as amount")
+                                )
+                                ->whereIn("repayment_emi.payee",$friends_ids)
+                                ->where("repayment_emi.emi_status","OPEN")
+                                ->where("repayment_emi.status",1)
+                                ->groupBy("user.id","user.name")
+                                ->orderByDesc("amount")
+                                ->get();
+
+        return $data;
+    }
+
 }
