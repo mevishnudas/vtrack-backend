@@ -486,4 +486,23 @@ class Repayment extends Model
         return $data;
     }
 
+    public static function upcomingRePayments($sort_data){
+        $response = DB::table("repayment")
+                    ->select(
+                        "id",
+                        "total",
+                        "payment_date"
+                    )
+                    ->whereBetween("payment_date", [
+                        $sort_data["start_date"],
+                        $sort_data["end_date"]
+                    ])
+                    ->where("payee_id",$sort_data["user_id"])
+                    ->get();
+        return $response;
+    }
+
+    public static function upcomingEMIPayments($sort_data){
+
+    }
 }

@@ -31,6 +31,7 @@ Route::post('/repayment/add',[RepaymentController::class,'addNew'])->middleware(
 Route::post('/repayment/update',[RepaymentController::class,'update'])->middleware([ApiAuth::class]);
 Route::post('/repayment/user/summary',[RepaymentController::class,'userSummary'])->middleware([ApiAuth::class]);
 Route::get('/repayment/overall/summary',[RepaymentController::class,'overallSummary'])->middleware([ApiAuth::class]);
+Route::post('/repayment/overall/upcoming',[RepaymentController::class,'overallUpcoming'])->middleware([ApiAuth::class]);
 
 #EMI
 Route::post('/repayment/emi/add',[RepaymentController::class,'emiAdd'])->middleware([ApiAuth::class]);

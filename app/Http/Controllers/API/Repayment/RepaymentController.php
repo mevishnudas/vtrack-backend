@@ -601,4 +601,36 @@ class RepaymentController extends Controller
         );
         return response(["msg"=>"Success","data"=>$data],200);
     }
+
+    public function overallUpcoming(Request $request){
+        $validator = Validator::make($request->all(), [
+            "user_id"=>'required|exists:user,id',
+            "start_date"=>'required|date|date_format:Y-m-d',
+            "end_date"   => 'required|date|date_format:Y-m-d|after:start_date',
+        ]);
+        if ($validator->fails()) {
+            return response(["status"=>401,"msg"=>"Invalid Parameters","data"=>$validator->errors()],401);
+        }
+
+        $data = array();
+        $sort_data = array(
+            "user_id"=>$request->user_id,
+            "start_date"=>$request->start_date,
+            "end_date"=>$request->end_date
+        );
+        $upcomingRePayments = Repayment::upcomingRePayments($sort_data);
+
+        $data["repayments"] = array();
+        $temp_array = array();
+        foreach ($upcomingRePayments as $upcomingRePayments_row) {
+            // if(empty($data["repayments"][$upcomingRePayments_row->payment_date])){
+            //     $data["repayments"][$upcomingRePayments_row->payment_date] = array();
+            // }
+            // $data["repayments"][] = array("total"=>$upcomingRePayments_row->total);
+            $temp_array[$upcomingRePayments_row->payment_date][] = $upcomingRePayments_row->total;
+        }
+        $data["repayments"] = $temp_array;
+        return response(["msg"=>"Success","data"=>$data],200);
+    }
+
 }
