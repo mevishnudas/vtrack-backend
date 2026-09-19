@@ -630,6 +630,37 @@ class RepaymentController extends Controller
             $temp_array[$upcomingRePayments_row->payment_date][] = $upcomingRePayments_row->total;
         }
         $data["repayments"] = $temp_array;
+
+        #------------ EMI ----------------#
+        $upcomingEMIPayments = Repayment::upcomingEMIPayments($sort_data);
+        $emiList = array(
+            "NOT_GENERATED"=>array(),
+            "GENERATED"=>array()
+        );
+        foreach ($upcomingEMIPayments as $upcomingEMIPayments_row) {
+
+            $temp_array = array(
+                "amount"=>$upcomingEMIPayments_row->amount,
+                "payment_date"=>$upcomingEMIPayments_row->payment_date,
+                "duration"=>$upcomingEMIPayments_row->duration,
+                "paid"=>$upcomingEMIPayments_row->paid,
+
+                "schedule_principle"=>(string)$upcomingEMIPayments_row->schedule_principle,
+                "schedule_amount"=>(string)$upcomingEMIPayments_row->schedule_amount,
+                "schedule_payment_date"=>(string)$upcomingEMIPayments_row->schedule_payment_date,
+                "schedule_remarks"=>(string)$upcomingEMIPayments_row->schedule_remarks,
+            );
+
+            if(empty($upcomingEMIPayments_row->schedule_payment_date)){
+                $emiList["NOT_GENERATED"][] = $temp_array;
+            }else{
+                $emiList["GENERATED"][$upcomingEMIPayments_row->schedule_payment_date][] = $temp_array;
+            }
+
+
+        }
+        //sleep(5);
+        $data["emi"] = $emiList;
         return response(["msg"=>"Success","data"=>$data],200);
     }
 

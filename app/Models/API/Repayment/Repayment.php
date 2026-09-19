@@ -503,6 +503,60 @@ class Repayment extends Model
     }
 
     public static function upcomingEMIPayments($sort_data){
+        $response = DB::table("repayment_emi as emi")
+                ->select(
+                    "emi.id",
+                    "emi.emi",
+                    "emi.duration",
+                    "emi.paid",
+                    "emi.amount",
+                    "emi.payment_date",
 
+                    "schedule.payment_date as schedule_payment_date",
+                    "schedule.principle as schedule_principle",
+                    "schedule.amount as schedule_amount",
+                    "schedule.remarks as schedule_remarks"
+                )
+                ->leftJoinSub(
+                    DB::table("repayment_emi_schedule as s1")
+                        ->select(
+                            "s1.id",
+                            "s1.emi_id",
+                            "s1.payment_date",
+                            "s1.principle",
+                            "s1.amount",
+                            "s1.remarks"
+                        )
+                        ->whereBetween("s1.payment_date", [
+                            $sort_data["start_date"],
+                            $sort_data["end_date"]
+                        ])
+                        ->whereRaw("
+                            s1.id = (
+                                SELECT MIN(s2.id)
+                                FROM repayment_emi_schedule s2
+                                WHERE s2.emi_id = s1.emi_id
+                                AND s2.payment_date BETWEEN ? AND ?
+                            )
+                        ", [
+                            $sort_data["start_date"],
+                            $sort_data["end_date"]
+                        ]),
+                    "schedule",
+                    "emi.id",
+                    "=",
+                    "schedule.emi_id"
+                )
+                ->where("emi.payee", $sort_data["user_id"])
+                ->where("emi.emi_status", "OPEN")
+                ->whereRaw("DAY(emi.payment_date) BETWEEN ? AND ?", [
+                    date("d", strtotime($sort_data["start_date"])),
+                    date("d", strtotime($sort_data["end_date"]))
+                ])
+                ->orderBy("schedule.payment_date","ASC")
+                ->get();
+
+        return $response;
     }
+
 }
