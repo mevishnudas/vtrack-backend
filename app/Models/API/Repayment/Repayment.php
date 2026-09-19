@@ -498,6 +498,7 @@ class Repayment extends Model
                         $sort_data["end_date"]
                     ])
                     ->where("payee_id",$sort_data["user_id"])
+                    ->orderBy("payment_date","ASC")
                     ->get();
         return $response;
     }
